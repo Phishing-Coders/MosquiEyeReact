@@ -1,6 +1,7 @@
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
+import { useAuth0 } from "@auth0/auth0-react";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
@@ -16,6 +17,7 @@ import ProgressCircle from "../../components/ProgressCircle";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { logout } = useAuth0();
 
   return (
     <Box m="20px">
@@ -35,6 +37,18 @@ const Dashboard = () => {
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
             Download Reports
+          </Button>
+          <Button
+            onClick={() => logout({ returnTo: window.location.origin })}
+            sx={{
+              backgroundColor: colors.redAccent[700],
+              color: colors.grey[100],
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+            }}
+          >
+            Logout
           </Button>
         </Box>
       </Box>

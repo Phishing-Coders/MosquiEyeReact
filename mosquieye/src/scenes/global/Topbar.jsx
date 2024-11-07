@@ -10,12 +10,14 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const [selected, setSelected] = useState("Dashboard");
+  const { logout } = useAuth0();
 
   const location = useLocation(); // Get current location (URL) from react-router
 
@@ -83,6 +85,13 @@ const Topbar = () => {
         </IconButton>
         <IconButton>
           <PersonOutlinedIcon />
+        </IconButton>
+        <IconButton
+          variant="contained"
+          color="secondary"
+          onClick={() => logout({ returnTo: window.location.origin })}
+        >
+          Logout
         </IconButton>
       </Box>
     </Box>
