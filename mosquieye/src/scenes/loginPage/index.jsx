@@ -1,34 +1,33 @@
 import { Box, Button, Grid, Snackbar, Alert, Typography } from "@mui/material"; // Ensure Grid is imported
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation to track the location
+import { useAuth0 } from "@auth0/auth0-react"; // Import useAuth0 hook
 
 import background from "../../assets/medicalbackground1.png";
 
-const LoginPage = ({ setIsAuthenticated }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const LoginPage = () => {
+  const { loginWithRedirect, isAuthenticated } = useAuth0(); // Destructure loginWithRedirect from useAuth0
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // To track the URL and detect back navigation
 
-  // Reload the login page when navigating back
   useEffect(() => {
-    if (location.pathname === "/login") {
-      window.location.reload(); // This will reload the login page if the user goes back
+    if (isAuthenticated) {
+      navigate('/dashboard');
     }
-  }, [location.pathname]); // Trigger the effect when the pathname changes
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Simulate a login process
-    if (username === "admin" && password === "password") {
-      setIsAuthenticated(true); // Set authentication state
-      navigate("/dashboard"); // Navigate to the dashboard on successful login
-    } else {
-      setError("Invalid username or password");
-      setOpenSnackbar(true);
-    }
+    // // Simulate a login process
+    // if (username === "admin" && password === "password") {
+    //   setIsAuthenticated(true); // Set authentication state
+    //   navigate("/dashboard"); // Navigate to the dashboard on successful login
+    // } else {
+    //   setError("Invalid username or password");
+    //   setOpenSnackbar(true);
+    // }
   };
 
   const handleCloseSnackbar = () => {
@@ -82,7 +81,7 @@ const LoginPage = ({ setIsAuthenticated }) => {
               Welcome to Moquieye Web Application
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
+              {/* <TextField
                 variant="outlined"
                 margin="normal"
                 required
@@ -121,12 +120,13 @@ const LoginPage = ({ setIsAuthenticated }) => {
                     </InputAdornment>
                   ),
                 }}
-              />
+              /> */}
               <Button
-                type="submit"
+                // type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                onClick={() => loginWithRedirect()}
                 sx={{
                   mt: 3,
                   mb: 2,
@@ -134,9 +134,9 @@ const LoginPage = ({ setIsAuthenticated }) => {
                     "linear-gradient(180deg, rgb(145,129,244) 0%, rgb(80,56,237) 100%)",
                 }}
               >
-                Login Now
+                Login with Auth0
               </Button>
-              <Button
+              {/* <Button
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -149,7 +149,7 @@ const LoginPage = ({ setIsAuthenticated }) => {
                 }}
               >
                 Forgot Password?
-              </Button>
+              </Button> */}
             </Box>
             <Snackbar
               open={openSnackbar}
