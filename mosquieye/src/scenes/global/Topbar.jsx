@@ -2,22 +2,33 @@ import { useState, useEffect } from "react";
 import { Box, IconButton, useTheme } from "@mui/material";
 import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../theme";
-import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+<<<<<<< Updated upstream
 import SearchIcon from "@mui/icons-material/Search";
 import { Link, useLocation } from "react-router-dom";
+=======
+import ExitToAppIcon from "@mui/icons-material/ExitToApp"; // Import door icon
+import { useAuth0 } from "@auth0/auth0-react";
+import { useLocation } from "react-router-dom";
+>>>>>>> Stashed changes
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+<<<<<<< Updated upstream
   const [selected, setSelected] = useState("Dashboard");
 
+=======
+  const { logout } = useAuth0();
+>>>>>>> Stashed changes
   const location = useLocation(); // Get current location (URL) from react-router
+
+  const [selected, setSelected] = useState("Dashboard");
 
   useEffect(() => {
     // Update the selected state based on the current path
@@ -44,6 +55,10 @@ const Topbar = () => {
       setSelected("Line Chart");
     } else if (path === "/geography") {
       setSelected("Geography Chart");
+    } else if (path === "/profile") {
+      setSelected("Profile");
+    } else if (path === "/maps") {
+      setSelected("Maps");
     }
   }, [location]); // Re-run this effect whenever the route changes
 
@@ -53,19 +68,7 @@ const Topbar = () => {
   }
 
   return (
-    <Box display="flex" justifyContent="space-between" p={2}>
-      {/* SEARCH BAR */}
-      <Box
-        display="flex"
-        backgroundColor={colors.primary[400]}
-        borderRadius="3px"
-      >
-        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
-      </Box>
-
+    <Box display="flex" justifyContent="flex-end" p={2}>
       {/* ICONS */}
       <Box display="flex">
         <IconButton onClick={colorMode.toggleColorMode}>
@@ -78,12 +81,23 @@ const Topbar = () => {
         <IconButton>
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={() => window.location.href = "/maps"}>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={() => window.location.href = "/profile"}>
           <PersonOutlinedIcon />
         </IconButton>
+<<<<<<< Updated upstream
+=======
+        
+        {/* Logout Button with Door Icon */}
+        <IconButton
+          onClick={() => logout({ returnTo: window.location.origin })}
+          color="secondary"
+        >
+          <ExitToAppIcon /> {/* Door icon for logout */}
+        </IconButton>
+>>>>>>> Stashed changes
       </Box>
     </Box>
   );
