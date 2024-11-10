@@ -1,6 +1,4 @@
-import LockIcon from "@mui/icons-material/Lock";
-import PersonIcon from "@mui/icons-material/Person";
-import { Box, Button, Grid, InputAdornment, Snackbar, Alert, TextField, Typography } from "@mui/material"; // Ensure Grid is imported
+import { Box, Button, Grid, Snackbar, Alert, Typography } from "@mui/material"; // Ensure Grid is imported
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation to track the location
 import { useAuth0 } from "@auth0/auth0-react"; // Import useAuth0 hook

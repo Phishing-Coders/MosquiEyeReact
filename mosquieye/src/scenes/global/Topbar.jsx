@@ -46,6 +46,10 @@ const Topbar = () => {
       setSelected("Line Chart");
     } else if (path === "/geography") {
       setSelected("Geography Chart");
+    } else if (path === "/profile") {
+      setSelected("Profile");
+    } else if (path === "/maps") {
+      setSelected("Maps");
     }
   }, [location]); // Re-run this effect whenever the route changes
 
@@ -55,19 +59,7 @@ const Topbar = () => {
   }
 
   return (
-    <Box display="flex" justifyContent="space-between" p={2}>
-      {/* SEARCH BAR */}
-      <Box
-        display="flex"
-        backgroundColor={colors.primary[400]}
-        borderRadius="3px"
-      >
-        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
-      </Box>
-
+    <Box display="flex" justifyContent="flex-end" p={2}>
       {/* ICONS */}
       <Box display="flex">
         <IconButton onClick={colorMode.toggleColorMode}>
@@ -80,18 +72,19 @@ const Topbar = () => {
         <IconButton>
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={() => window.location.href = "/maps"}>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={() => window.location.href = "/profile"}>
           <PersonOutlinedIcon />
         </IconButton>
+        
+        {/* Logout Button with Door Icon */}
         <IconButton
-          variant="contained"
-          color="secondary"
           onClick={() => logout({ returnTo: window.location.origin })}
+          color="secondary"
         >
-          Logout
+          <ExitToAppIcon /> {/* Door icon for logout */}
         </IconButton>
       </Box>
     </Box>
