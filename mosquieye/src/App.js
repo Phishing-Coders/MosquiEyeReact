@@ -22,15 +22,11 @@ import MapPage from "./scenes/maps";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
-<<<<<<< Updated upstream
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication state
-=======
   const { isAuthenticated, isLoading } = useAuth0(); // Destructure isAuthenticated and isLoading from useAuth0
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
->>>>>>> Stashed changes
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -41,20 +37,6 @@ function App() {
           <main className="content">
             {isAuthenticated && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
-<<<<<<< Updated upstream
-              <Route path="/" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/form" element={<Form />} />
-              <Route path="/bar" element={<Bar />} />
-              <Route path="/pie" element={<Pie />} />
-              <Route path="/line" element={<Line />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/geography" element={<Geography />} />
-=======
               <Route
                 path="/"
                 element={
@@ -147,7 +129,6 @@ function App() {
                   isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
                 }
               />
->>>>>>> Stashed changes
             </Routes>
           </main>
         </div>

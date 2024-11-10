@@ -7,25 +7,15 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-<<<<<<< Updated upstream
-import SearchIcon from "@mui/icons-material/Search";
-import { Link, useLocation } from "react-router-dom";
-=======
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"; // Import door icon
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom";
->>>>>>> Stashed changes
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-<<<<<<< Updated upstream
-  const [selected, setSelected] = useState("Dashboard");
-
-=======
   const { logout } = useAuth0();
->>>>>>> Stashed changes
   const location = useLocation(); // Get current location (URL) from react-router
 
   const [selected, setSelected] = useState("Dashboard");
@@ -87,8 +77,6 @@ const Topbar = () => {
         <IconButton onClick={() => window.location.href = "/profile"}>
           <PersonOutlinedIcon />
         </IconButton>
-<<<<<<< Updated upstream
-=======
         
         {/* Logout Button with Door Icon */}
         <IconButton
@@ -97,7 +85,6 @@ const Topbar = () => {
         >
           <ExitToAppIcon /> {/* Door icon for logout */}
         </IconButton>
->>>>>>> Stashed changes
       </Box>
     </Box>
   );
