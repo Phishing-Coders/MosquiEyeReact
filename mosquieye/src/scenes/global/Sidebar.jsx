@@ -147,7 +147,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Invoices Balances"
+              title="Recent Total Eggs"
               to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}

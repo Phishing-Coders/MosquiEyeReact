@@ -204,7 +204,7 @@ export const mockDataInvoices = [
     id: 1,
     name: "Jon Snow",
     email: "jonsnow@gmail.com",
-    cost: "21.24",
+    cost: "1200",
     phone: "(665)121-5454",
     date: "03/12/2022",
   },
@@ -212,7 +212,7 @@ export const mockDataInvoices = [
     id: 2,
     name: "Cersei Lannister",
     email: "cerseilannister@gmail.com",
-    cost: "1.24",
+    cost: "1700",
     phone: "(421)314-2288",
     date: "06/15/2021",
   },
@@ -220,7 +220,7 @@ export const mockDataInvoices = [
     id: 3,
     name: "Jaime Lannister",
     email: "jaimelannister@gmail.com",
-    cost: "11.24",
+    cost: "1800",
     phone: "(422)982-6739",
     date: "05/02/2022",
   },
@@ -228,7 +228,7 @@ export const mockDataInvoices = [
     id: 4,
     name: "Anya Stark",
     email: "anyastark@gmail.com",
-    cost: "80.55",
+    cost: "1300",
     phone: "(921)425-6742",
     date: "03/21/2022",
   },
@@ -236,7 +236,7 @@ export const mockDataInvoices = [
     id: 5,
     name: "Daenerys Targaryen",
     email: "daenerystargaryen@gmail.com",
-    cost: "1.24",
+    cost: "2200",
     phone: "(421)445-1189",
     date: "01/12/2021",
   },
@@ -244,7 +244,7 @@ export const mockDataInvoices = [
     id: 6,
     name: "Ever Melisandre",
     email: "evermelisandre@gmail.com",
-    cost: "63.12",
+    cost: "1100",
     phone: "(232)545-6483",
     date: "11/02/2022",
   },
@@ -252,7 +252,7 @@ export const mockDataInvoices = [
     id: 7,
     name: "Ferrara Clifford",
     email: "ferraraclifford@gmail.com",
-    cost: "52.42",
+    cost: "800",
     phone: "(543)124-0123",
     date: "02/11/2022",
   },
@@ -260,7 +260,7 @@ export const mockDataInvoices = [
     id: 8,
     name: "Rossini Frances",
     email: "rossinifrances@gmail.com",
-    cost: "21.24",
+    cost: "750",
     phone: "(222)444-5555",
     date: "05/02/2021",
   },
@@ -320,44 +320,44 @@ export const mockTransactions = [
 export const mockBarData = [
   {
     country: "Sun",
-    "hot dog": 3000,
-    "hot dogColor": "hsl(229, 70%, 50%)",
+    "Total Eggs": 3000,
+    "Total EggsColor": "hsl(229, 70%, 50%)",
     
   },
   {
     country: "Mon",
-    "hot dog": 4400,
-    "hot dogColor": "hsl(307, 70%, 50%)",
+    "Total Eggs": 4400,
+    "Total EggsColor": "hsl(307, 70%, 50%)",
     
   },
   {
     country: "Tue",
-    "hot dog": 5300,
-    "hot dogColor": "hsl(72, 70%, 50%)",
+    "Total Eggs": 5300,
+    "Total EggsColor": "hsl(72, 70%, 50%)",
     
   },
   {
     country: "Wed",
-    "hot dog": 6700,
-    "hot dogColor": "hsl(257, 70%, 50%)",
+    "Total Eggs": 6700,
+    "Total EggsColor": "hsl(257, 70%, 50%)",
     
   },
   {
     country: "Thu",
-    "hot dog": 5800,
-    "hot dogColor": "hsl(190, 70%, 50%)",
+    "Total Eggs": 5800,
+    "Total EggsColor": "hsl(190, 70%, 50%)",
     
   },
   {
     country: "Fri",
-    "hot dog": 7200,
-    "hot dogColor": "hsl(208, 70%, 50%)",
+    "Total Eggs": 7200,
+    "Total EggsColor": "hsl(208, 70%, 50%)",
    
   },
   {
     country: "Sat",
-    "hot dog": 8100,
-    "hot dogColor": "hsl(87, 70%, 50%)",
+    "Total Eggs": 8100,
+    "Total EggsColor": "hsl(87, 70%, 50%)",
     
   },
 ];
@@ -397,7 +397,7 @@ export const mockPieData = [
 
 export const mockLineData = [
   {
-    id: "japan",
+    id: "Total Eggs",
     color: tokens("dark").greenAccent[500],
     data: [
       {
