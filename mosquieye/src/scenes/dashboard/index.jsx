@@ -38,18 +38,6 @@ const Dashboard = () => {
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
             Download Reports
           </Button>
-          <Button
-            onClick={() => logout({ returnTo: window.location.origin })}
-            sx={{
-              backgroundColor: colors.redAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            Logout
-          </Button>
         </Box>
       </Box>
 
