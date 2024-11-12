@@ -130,7 +130,6 @@ function App() {
                   isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
                 }
               />
-
             </Routes>
           </main>
         </div>

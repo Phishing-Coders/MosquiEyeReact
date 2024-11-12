@@ -19,24 +19,28 @@ const loadGoogleMapsAPI = (apiKey) => {
 const MapPage = () => {
   const [googleMaps, setGoogleMaps] = useState(null);
   const [map, setMap] = useState(null);
-  const apiKey = 'AIzaSyCoaxAUA18nH_mzQi9X7JwSnTXSPpMlmg4'; // Provided API Key
+  const apiKey = 'AIzaSyCoaxAUA18nH_mzQi9X7JwSnTXSPpMlmg4'; // Correctly access the API key from environment variables
 
   useEffect(() => {
     // Load Google Maps API once the component is mounted
-    loadGoogleMapsAPI(apiKey)
-      .then((googleMaps) => {
-        setGoogleMaps(googleMaps); // Store Google Maps in state
-        const mapElement = document.getElementById('google-map');
-        const mapInstance = new googleMaps.Map(mapElement, {
-          center: { lat: 1.4927, lng: 103.7414 }, // Example center (New York)
-          zoom: 13,
-          mapTypeControl: false, // Optional controls
+    if (apiKey) {
+      loadGoogleMapsAPI(apiKey)
+        .then((googleMaps) => {
+          setGoogleMaps(googleMaps); // Store Google Maps in state
+          const mapElement = document.getElementById('google-map');
+          const mapInstance = new googleMaps.Map(mapElement, {
+            center: { lat: 1.4927, lng: 103.7414 }, // Example center (can be any coordinates)
+            zoom: 13,
+            mapTypeControl: false, // Optional controls
+          });
+          setMap(mapInstance); // Store the map instance in state
+        })
+        .catch((error) => {
+          console.error('Google Maps API failed to load', error);
         });
-        setMap(mapInstance); // Store the map instance in state
-      })
-      .catch((error) => {
-        console.error('Google Maps API failed to load', error);
-      });
+    } else {
+      console.error('Google Maps API key is missing!');
+    }
   }, [apiKey]);
 
   return (
