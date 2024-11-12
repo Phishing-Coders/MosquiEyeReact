@@ -11,7 +11,7 @@ const Invoices = () => {
     { field: "id", headerName: "ID" },
     {
       field: "name",
-      headerName: "Name",
+      headerName: "Full Name",
       flex: 1,
       cellClassName: "name-column--cell",
     },
