@@ -27,11 +27,11 @@ const Invoices = () => {
     },
     {
       field: "cost",
-      headerName: "Cost",
+      headerName: "Total Eggs Found",
       flex: 1,
       renderCell: (params) => (
         <Typography color={colors.greenAccent[500]}>
-          ${params.row.cost}
+          {params.row.cost}
         </Typography>
       ),
     },
@@ -44,7 +44,7 @@ const Invoices = () => {
 
   return (
     <Box m="20px">
-      <Header title="INVOICES" subtitle="List of Invoice Balances" />
+      <Header title="Total Eggs" subtitle="List of recent uploads" />
       <Box
         m="40px 0 0 0"
         height="75vh"
