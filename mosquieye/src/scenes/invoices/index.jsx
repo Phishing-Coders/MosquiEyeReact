@@ -27,7 +27,7 @@ const Invoices = () => {
     },
     {
       field: "cost",
-      headerName: "Total Eggs Found",
+      headerName: "Total Eggs Scanned",
       flex: 1,
       renderCell: (params) => (
         <Typography color={colors.greenAccent[500]}>
