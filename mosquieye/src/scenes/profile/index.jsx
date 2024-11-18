@@ -1,12 +1,17 @@
-import { ArrowBack, CalendarToday, Check, Edit, HelpOutline, Home, Lock, Notifications, Person, Settings, ShowChart } from "@mui/icons-material";
-import { Avatar, Box, Button, Divider, IconButton, List, ListItem, ListItemIcon, ListItemText, TextField, Typography } from "@mui/material";
+import { Check, PhotoCamera } from "@mui/icons-material";
+import { Avatar, Box, Button, IconButton, TextField, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import { useState } from "react";
+import { useTheme } from "@mui/material/styles";
 
 const Profile = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const theme = useTheme(); // Access theme for dark/light mode compatibility
+
+  const [profilePicture, setProfilePicture] = useState("https://via.placeholder.com/120");
 
   // Validation schema
   const profileSchema = yup.object().shape({
@@ -14,10 +19,16 @@ const Profile = () => {
     lastName: yup.string().required("required"),
     email: yup.string().email("invalid email").required("required"),
     address: yup.string().required("required"),
-    contact: yup.string().required("required"),
+    contact: yup
+      .string()
+      .matches(/^\d+$/, "Contact must be numeric")
+      .required("required"),
     city: yup.string().required("required"),
     state: yup.string().required("required"),
-    password: yup.string().required("required"),
+    password: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .required("required"),
   });
 
   const initialValues = {
@@ -25,25 +36,62 @@ const Profile = () => {
     lastName: "Bozorgi",
     email: "Mehrabbozorgi.business@gmail.com",
     address: "33062 Zboncak isle",
-    contact: "58077.79",
+    contact: "5807779",
     city: "Mehrab",
     state: "Bozorgi",
     password: "sbdfbnd65sfdvb s",
   };
 
+  
   const handleFormSubmit = (values) => {
-    console.log(values);
+    console.log("Form Submitted: ", values);
+    alert("Profile updated successfully!");
+  };
+
+  const handlePictureChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfilePicture(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
     <Box m="20px">
       <Header title="EDIT PROFILE" subtitle="Update your profile information" />
-      
-      <Box display="flex" gap={2} mb="20px">
-        <Avatar src="https://via.placeholder.com/120" alt="User" sx={{ width: 120, height: 120 }} />
-        <Typography variant="h3" fontWeight="bold" color="black">
-          Edit profile
-        </Typography>
+
+      <Box display="flex" gap={2} mb="20px" alignItems="center">
+        <Avatar src={profilePicture} alt="User" sx={{ width: 120, height: 120 }} />
+        <Box>
+          <IconButton
+            component="label"
+            sx={{
+              bgcolor: "primary.main",
+              color: theme.palette.mode === "dark" ? "white" : "black", // Adjust icon color based on theme
+              "&:hover": {
+                bgcolor: "primary.dark",
+                color: theme.palette.mode === "dark" ? "lightgray" : "gray",
+              },
+              padding: 2,
+              borderRadius: "50%",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <PhotoCamera fontSize="large" />
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handlePictureChange}
+            />
+          </IconButton>
+          <Typography variant="caption" color="text.secondary" mt={1}>
+            Upload Profile Picture
+          </Typography>
+        </Box>
       </Box>
 
       <Formik
@@ -160,6 +208,7 @@ const Profile = () => {
                 fullWidth
                 variant="outlined"
                 label="Password"
+                type="password"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -173,13 +222,38 @@ const Profile = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px" gap={2}>
-              <Button type="button" variant="outlined" color="warning" sx={{ width: "182px", height: "55px" }}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained" color="warning" sx={{ width: "182px", height: "55px" }}>
-                Save
-              </Button>
-            </Box>
+  <Button
+    type="button"
+    variant="outlined"
+    sx={{
+      width: "182px",
+      height: "55px",
+      borderColor: theme.palette.warning.main,
+      color: theme.palette.mode === "dark" ? theme.palette.warning.light : theme.palette.warning.dark,
+      "&:hover": {
+        bgcolor: theme.palette.warning.light,
+        borderColor: theme.palette.warning.dark,
+      },
+    }}
+  >
+    Cancel
+  </Button>
+  <Button
+    type="submit"
+    variant="contained"
+    sx={{
+      width: "182px",
+      height: "55px",
+      bgcolor: theme.palette.warning.main,
+      color: theme.palette.getContrastText(theme.palette.warning.main),
+      "&:hover": {
+        bgcolor: theme.palette.warning.dark,
+      },
+    }}
+  >
+    Save
+  </Button>
+</Box>
           </form>
         )}
       </Formik>
