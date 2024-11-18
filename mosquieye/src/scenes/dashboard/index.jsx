@@ -50,17 +50,17 @@ const Dashboard = () => {
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="12,361"
-            subtitle="Emails Sent"
-            progress="0.75"
-            increase="+14%"
+            title="150"
+            subtitle="New Location Alert"
+            progress="0.10"
+            increase="+10%"
             icon={
               <EmailIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -69,17 +69,17 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="431,225"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
+            title="1400"
+            subtitle="Latest Eggs Scanned"
+            progress="0.20"
+            increase="+20%"
             icon={
               <PointOfSaleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -88,16 +88,16 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="32,441"
-            subtitle="New Clients"
-            progress="0.30"
+            title="15"
+            subtitle="New Staff"
+            progress="0.15"
             increase="+5%"
             icon={
               <PersonAddIcon
@@ -106,25 +106,7 @@ const Dashboard = () => {
             }
           />
         </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
+        
 
         {/* ROW 2 */}
         <Box
@@ -226,7 +208,7 @@ const Dashboard = () => {
           p="30px"
         >
           <Typography variant="h5" fontWeight="600">
-            Campaign
+            Mosquito Eggs
           </Typography>
           <Box
             display="flex"
@@ -240,9 +222,9 @@ const Dashboard = () => {
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
             >
-              $48,352 revenue generated
+              10000 Total Scanned
             </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
+            <Typography>Avegrage All Scanned Mosquito Eggs</Typography>
           </Box>
         </Box>
         <Box
