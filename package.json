@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "crypto-browserify": "^3.12.1",
+    "path-browserify": "^1.0.1",
+    "react-scripts": "^5.0.1"
+  },
+  "scripts": {
+  "start": "react-app-rewired start",
+  "build": "react-app-rewired build",
+  "test": "react-app-rewired test",
+  "eject": "react-scripts eject"
+}
+  
+  
+}

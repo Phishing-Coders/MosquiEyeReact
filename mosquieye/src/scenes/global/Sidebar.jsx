@@ -16,6 +16,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import CenterFocusWeakIcon from '@mui/icons-material/CenterFocusWeak';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -41,6 +42,46 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
+<<<<<<< Updated upstream
+=======
+  const location = useLocation(); // Get current location (URL) from react-router
+
+  useEffect(() => {
+    // Update the selected state based on the current path
+    const path = location.pathname;
+    if (path === "/dashboard") {
+      setSelected("Dashboard");
+    } else if (path === "/team") {
+      setSelected("Manage Team");
+    } else if (path === "/contacts") {
+      setSelected("Contacts Information");
+    } else if (path === "/invoices") {
+      setSelected("Invoices Balances");
+    } else if (path === "/scan") {
+      setSelected("Scan");
+    } else if (path === "/form") {
+      setSelected("Profile Form");
+    } else if (path === "/calendar") {
+      setSelected("Calendar");
+    } else if (path === "/faq") {
+      setSelected("FAQ Page");
+    } else if (path === "/bar") {
+      setSelected("Bar Chart");
+    } else if (path === "/pie") {
+      setSelected("Pie Chart");
+    } else if (path === "/line") {
+      setSelected("Line Chart");
+    } else if (path === "/geography") {
+      setSelected("Geography Chart");
+    }
+  }, [location]); // Re-run this effect whenever the route changes
+
+  // Don't show the sidebar when on the login page
+  if (location.pathname === "/") {
+    return null; // Don't render the sidebar if on the login page
+  }
+
+>>>>>>> Stashed changes
   return (
     <Box
       sx={{
@@ -161,6 +202,13 @@ const Sidebar = () => {
             >
               Pages
             </Typography>
+            <Item
+              title="Scan"
+              to="/scan"
+              icon={<CenterFocusWeakIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Item
               title="Profile Form"
               to="/form"
