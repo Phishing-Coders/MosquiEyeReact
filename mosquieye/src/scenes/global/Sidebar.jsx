@@ -16,6 +16,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import { useUser } from '@clerk/clerk-react';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -40,9 +41,12 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
+  const { isSignedIn, user, isLoaded } = useUser();
 
-  const location = useLocation(); // Get current location (URL) from react-router
-
+  if (!isLoaded) {
+    return null;
+  }
   useEffect(() => {
     // Update the selected state based on the current path
     const path = location.pathname;
@@ -142,7 +146,7 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Hanif
+                  {user.firstName} {user.lastName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   Staff

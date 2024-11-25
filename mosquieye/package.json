@@ -1,65 +1,55 @@
 {
   "name": "mosquieye",
-  "version": "0.1.0",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@auth0/auth0-react": "^2.2.4",
+    "@clerk/clerk-react": "^5.17.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@fullcalendar/core": "^5.11.5",
-    "@fullcalendar/daygrid": "^5.11.5",
-    "@fullcalendar/interaction": "^5.11.3",
-    "@fullcalendar/list": "^5.11.5",
-    "@fullcalendar/react": "^5.11.2",
-    "@fullcalendar/timegrid": "^5.11.5",
-    "@mui/icons-material": "^5.16.7",
-    "@mui/material": "^5.16.7",
-    "@mui/x-data-grid": "^5.17.26",
-    "@nivo/bar": "^0.87.0",
-    "@nivo/core": "^0.87.0",
-    "@nivo/geo": "^0.87.0",
-    "@nivo/line": "^0.87.0",
-    "@nivo/pie": "^0.87.0",
-    "@reduxjs/toolkit": "^1.8.5",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "chart.js": "^3.9.1",
-    "dotenv": "^16.4.5",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/list": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
+    "@ionic/react": "^8.4.0",
+    "@mui/icons-material": "^6.1.7",
+    "@mui/material": "^6.1.7",
+    "@mui/x-data-grid": "^7.22.2",
+    "@nivo/bar": "^0.88.0",
+    "@nivo/core": "^0.88.0",
+    "@nivo/geo": "^0.88.0",
+    "@nivo/line": "^0.88.0",
+    "@nivo/pie": "^0.88.0",
+    "axios": "^1.7.7",
     "formik": "^2.4.6",
-    "mongodb": "^6.10.0",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.2",
     "react": "^18.3.1",
-    "react-chartjs-2": "^4.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
     "react-pro-sidebar": "^0.7.1",
-    "react-redux": "^8.0.2",
-    "react-router-dom": "^6.27.0",
-    "react-scripts": "^5.0.1",
-    "web-vitals": "^2.1.4",
-    "yup": "^0.32.11"
+    "react-router-dom": "^6.28.0",
+    "yup": "^1.4.0"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.11.0",
+    "vite": "^5.4.10"
   }
 }

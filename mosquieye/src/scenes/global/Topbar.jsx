@@ -8,15 +8,17 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from "../../context/AuthContext";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { useClerk } from "@clerk/clerk-react";
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const [selected, setSelected] = useState("Dashboard");
-  const { logout } = useAuth0();
+  const { logout } = useAuth();
+  const { signOut } = useClerk();
 
   const location = useLocation(); // Get current location (URL) from react-router
 
@@ -79,10 +81,7 @@ const Topbar = () => {
         </IconButton>
         
         {/* Logout Button with Door Icon */}
-        <IconButton
-          onClick={() => logout({ returnTo: window.location.origin })}
-          color="secondary"
-        >
+        <IconButton onClick={() => signOut()}>
           <ExitToAppIcon /> {/* Door icon for logout */}
         </IconButton>
       </Box>
