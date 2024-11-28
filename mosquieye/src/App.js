@@ -19,6 +19,8 @@ import Calendar from "./scenes/calendar/calendar";
 import LoginPage from "./scenes/loginPage";
 import Profile from "./scenes/profile";
 import MapPage from "./scenes/maps";
+import Scan from "./scenes/scan";
+import Analysis from "./scenes/analysis";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -129,6 +131,18 @@ function App() {
                 element={
                   isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
                 }
+              />
+              <Route
+              path="/scan"
+              element={
+                isAuthenticated ? <Scan /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+              path="/analysis"
+              element={
+                isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
+              }
               />
             </Routes>
           </main>
