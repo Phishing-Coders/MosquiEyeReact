@@ -1,7 +1,8 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { tokens } from "../../theme";
-import { mockDataTeam } from "../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
@@ -10,8 +11,31 @@ import Header from "../../components/Header";
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/all');
+        const usersWithId = response.data.map(user => ({
+          id: user._id, // Use the MongoDB ObjectId as the id
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          access: 'user', // Assuming a default access level, adjust as needed
+          ...user
+        }));
+        setUsers(usersWithId);
+        console.log('Fetched users:', usersWithId);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const columns = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", flex: 1 },
     {
       field: "name",
       headerName: "Name",
@@ -19,24 +43,12 @@ const Team = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
-    },
-    {
-      field: "phone",
-      headerName: "Phone Number",
-      flex: 1,
-    },
-    {
       field: "email",
       headerName: "Email",
       flex: 1,
     },
     {
-      field: "accessLevel",
+      field: "access",
       headerName: "Access Level",
       flex: 1,
       renderCell: ({ row: { access } }) => {
@@ -59,7 +71,7 @@ const Team = () => {
             {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
             {access === "manager" && <SecurityOutlinedIcon />}
             {access === "user" && <LockOpenOutlinedIcon />}
-            <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
+            <Typography color={colors.grey[100]} sx={{ ml: 1 }}>
               {access}
             </Typography>
           </Box>
@@ -100,7 +112,13 @@ const Team = () => {
           },
         }}
       >
-        <DataGrid checkboxSelection rows={mockDataTeam} columns={columns} />
+        {users.length > 0 ? (
+          <DataGrid rows={users} columns={columns} />
+        ) : (
+          <Typography variant="h6" color={colors.grey[100]}>
+            No users found.
+          </Typography>
+        )}
       </Box>
     </Box>
   );
