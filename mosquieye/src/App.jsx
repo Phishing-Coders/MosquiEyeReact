@@ -20,6 +20,8 @@ import Calendar from "./scenes/calendar/calendar";
 import LoginPage from "./scenes/loginPage";
 import Profile from "./scenes/profile";
 import MapPage from "./scenes/maps";
+import Scan from "./scenes/scan";
+import Analysis from "./scenes/analysis";
 
 import { setupIonicReact } from "@ionic/react";
 import { IonButton, IonDatetime } from '@ionic/react';
@@ -135,6 +137,36 @@ function App() {
                 element={
                   isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
                 }
+              />
+              <Route
+              path="/scan"
+              element={
+                isAuthenticated ? <Scan /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+              path="/analysis"
+              element={
+                isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+                path="/maps"
+                element={
+                  isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
+                }
+              />
+              <Route
+              path="/scan"
+              element={
+                isAuthenticated ? <Scan /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+              path="/analysis"
+              element={
+                isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
+              }
               />
               <Route
                 path="/maps"

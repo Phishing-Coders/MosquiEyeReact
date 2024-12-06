@@ -72,6 +72,8 @@ const Sidebar = () => {
       setSelected("Line Chart");
     } else if (path === "/geography") {
       setSelected("Geography Chart");
+    } else if (path === "/scan") {
+      setSelected("Scan");
     }
   }, [location]); // Re-run this effect whenever the route changes
 
@@ -200,6 +202,13 @@ const Sidebar = () => {
             >
               Pages
             </Typography>
+            <Item
+              title="Scan"
+              to="/scan"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Item
               title="Profile Form"
               to="/form"
