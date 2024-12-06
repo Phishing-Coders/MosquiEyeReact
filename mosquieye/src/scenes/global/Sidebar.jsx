@@ -39,10 +39,10 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { isSignedIn, user, isLoaded } = useUser();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const location = useLocation();
-  const { isSignedIn, user, isLoaded } = useUser();
 
   if (!isLoaded) {
     return null;
@@ -137,7 +137,7 @@ const Sidebar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
+                  src={user.imageUrl || "https://via.placeholder.com/120"}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>

@@ -28,6 +28,9 @@ app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (r
         const payloadString = req.body.toString();
         const svixHeaders = req.headers;
 
+        console.log('Webhook payload:', payloadString);
+        console.log('Webhook headers:', svixHeaders);
+
         const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET_KEY);
         const evt = wh.verify(payloadString, svixHeaders);
         const eventData = JSON.parse(payloadString);
@@ -61,7 +64,10 @@ app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (r
         }
     } catch (err) {
         console.error('Webhook Error:', err);
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ 
+            error: err.message,
+            message: 'Error processing webhooks'
+        });
     }
 });
 
