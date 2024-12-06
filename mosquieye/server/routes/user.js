@@ -54,6 +54,23 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
+// Get user by clerkUserId
+router.get('/:clerkUserId', async (req, res) => {
+  try {
+    const { clerkUserId } = req.params;
+    const user = await User.findOne({ clerkUserId });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Error fetching user', error: error.message });
+  }
+});
+
 // Save or update user
 router.post('/saveUser', async (req, res) => {
   const { userId, email, firstName, lastName } = req.body;
@@ -88,6 +105,57 @@ router.post('/saveUser', async (req, res) => {
       message: 'Error saving user', 
       error: error.message 
     });
+  }
+});
+
+// Update user by clerkUserId
+router.put('/:clerkUserId', async (req, res) => {
+  try {
+    const { clerkUserId } = req.params;
+    const { email, firstName, lastName } = req.body;
+
+    const updatedUser = await User.findOneAndUpdate(
+      { clerkUserId },
+      { 
+        email, 
+        firstName, 
+        lastName,
+        updatedAt: new Date()
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'User updated successfully',
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Error updating user', error: error.message });
+  }
+});
+
+// Delete user by clerkUserId
+router.delete('/:clerkUserId', async (req, res) => {
+  try {
+    const { clerkUserId } = req.params;
+    const deletedUser = await User.findOneAndDelete({ clerkUserId });
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'User deleted successfully',
+      user: deletedUser
+    });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Error deleting user', error: error.message });
   }
 });
 
