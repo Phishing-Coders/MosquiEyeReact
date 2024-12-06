@@ -7,7 +7,7 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useClerk } from "@clerk/clerk-react";
@@ -21,6 +21,8 @@ const Topbar = () => {
   const { signOut } = useClerk();
 
   const location = useLocation(); // Get current location (URL) from react-router
+
+  const navigate = useNavigate(); // Get the navigate function from react-router
 
   useEffect(() => {
     // Update the selected state based on the current path
@@ -73,10 +75,10 @@ const Topbar = () => {
         <IconButton>
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton onClick={() => window.location.href = "/maps"}>
+        <IconButton onClick={() => navigate("/maps")}>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton onClick={() => window.location.href = "/profile"}>
+        <IconButton onClick={() => navigate("/profile")}>
           <PersonOutlinedIcon />
         </IconButton>
         

@@ -150,30 +150,6 @@ function App() {
                 isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
               }
               />
-              <Route
-                path="/maps"
-                element={
-                  isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
-                }
-              />
-              <Route
-              path="/scan"
-              element={
-                isAuthenticated ? <Scan /> : <Navigate to="/" replace />
-              }
-              />
-              <Route
-              path="/analysis"
-              element={
-                isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
-              }
-              />
-              <Route
-                path="/maps"
-                element={
-                  isAuthenticated ? <MapPage /> : <Navigate to="/" replace />
-                }
-              />
             </Routes>
           </main>
         </div>

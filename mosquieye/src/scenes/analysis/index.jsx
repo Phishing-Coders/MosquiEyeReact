@@ -5,7 +5,7 @@ import LineChart from "../../components/LineChart";
 import React, { useState, useEffect, useRef } from 'react';
 //import { Button, Card, Typography, Slider, TextField, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ChevronLeft, ChevronRight, Refresh, Compare, Tune } from '@mui/icons-material';
-import Cv from "./opencv"
+import opencv from './opencv';
 
 
 
