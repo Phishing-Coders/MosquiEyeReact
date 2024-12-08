@@ -1,6 +1,6 @@
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link, useLocation } from "react-router-dom"; // Import necessary hooks
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Import necessary hooks
 import "react-pro-sidebar/dist/css/styles.css";
 import { useState, useEffect } from "react"; // Import useState and useEffect
 import { tokens } from "../../theme";
@@ -10,7 +10,6 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
@@ -39,10 +38,11 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { isSignedIn, user, isLoaded } = useUser();
+  const {user, isLoaded } = useUser();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const location = useLocation();
+  const navigate = useNavigate();
 
   if (!isLoaded) {
     return null;
@@ -63,8 +63,8 @@ const Sidebar = () => {
     } else if (path === "/calendar") {
       setSelected("Calendar");
     } else if (path === "/faq") {
-      setSelected("FAQ Page");
-    } else if (path === "/bar") {
+      setSelected("Map Page");
+    } else if (path === "/map") {
       setSelected("Bar Chart");
     } else if (path === "/pie") {
       setSelected("Pie Chart");
@@ -74,6 +74,8 @@ const Sidebar = () => {
       setSelected("Geography Chart");
     } else if (path === "/scan") {
       setSelected("Scan");
+    } else if (path === "/profile") {
+      setSelected("Profile");
     }
   }, [location]); // Re-run this effect whenever the route changes
 
@@ -132,13 +134,14 @@ const Sidebar = () => {
 
           {!isCollapsed && (
             <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
+              <Box display="flex" justifyContent="center" alignItems="center" >
                 <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
                   src={user.imageUrl || "https://via.placeholder.com/120"}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
+                  onClick={() => navigate("/profile")}
                 />
               </Box>
               <Box textAlign="center">
@@ -150,7 +153,7 @@ const Sidebar = () => {
                 >
                   {user.firstName} {user.lastName}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
+                <Typography variant="h5" color={colors.greenAccent[500]} fontSize={22}>
                   Staff
                 </Typography>
               </Box>
@@ -224,9 +227,9 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
+              title="Map"
+              to="/maps"
+              icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

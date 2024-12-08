@@ -24,7 +24,6 @@ import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
 
 import { setupIonicReact } from "@ionic/react";
-import { IonButton, IonDatetime } from '@ionic/react';
 
 setupIonicReact();
 
@@ -33,9 +32,6 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const { isAuthenticated, isLoading } = useAuth();
 
-  // if (!isLoaded) {
-  //   return <div>Loading...</div>;
-  // }
 
   return (
     <ColorModeContext.Provider value={colorMode}>

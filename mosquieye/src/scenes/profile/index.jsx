@@ -37,10 +37,6 @@ const Profile = () => {
       .required("required"),
     city: yup.string().required("required"),
     state: yup.string().required("required"),
-    password: yup
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .required("required"),
   });
 
   const initialValues = {
@@ -51,7 +47,6 @@ const Profile = () => {
     contact: user?.contact || "",
     city: user?.city || "",
     state: user?.state || "",
-    password: "", // For security, don't populate password field
   };
 
   if(loading){
@@ -195,7 +190,7 @@ const Profile = () => {
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 4" }}
-                InputProps={{
+                Input={{
                   endAdornment: <Check fontSize="large" sx={{ color: "#23b000" }} />,
                 }}
               />
@@ -234,11 +229,10 @@ const Profile = () => {
                 error={!!touched.city && !!errors.city}
                 helperText={touched.city && errors.city}
                 sx={{ gridColumn: "span 2" }}
-                select
-                SelectProps={{ native: true }}
+                select={{ native: true }}
               >
-                <option value="Mehrab">Mehrab</option>
-                <option value="Kabul">Kabul</option>
+                <option value="Pasir Gudang">Pasir Gudang</option>
+                <option value="Sungai Buloh">Sungai Buloh</option>
               </TextField>
               <TextField
                 fullWidth
@@ -251,30 +245,28 @@ const Profile = () => {
                 error={!!touched.state && !!errors.state}
                 helperText={touched.state && errors.state}
                 sx={{ gridColumn: "span 2" }}
-                select
-                SelectProps={{ native: true }}
+                select={{ native: true }}
               >
-                <option value="Bozorgi">Bozorgi</option>
-                <option value="Kabul">Kabul</option>
+                <option value="Selangor">Selangor</option>
+                <option value="Johor Bahru">Johor Bahru</option>
               </TextField>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Password"
-                type="password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.password}
-                name="password"
-                error={!!touched.password && !!errors.password}
-                helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 4" }}
-                InputProps={{
-                  endAdornment: <Check fontSize="large" sx={{ color: "#23b000" }} />,
-                }}
-              />
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px" gap={2}>
+            <Box sx={{position: "absolute",bottom: 20,right: 22,display: "flex",justifyContent: "end",gap: 2,}}>
+              <Button
+                type="button"
+                variant="contained"
+                sx={{
+                  width: "182px",
+                  height: "55px",
+                  bgcolor: theme.palette.warning.main,
+                  color: theme.palette.getContrastText(theme.palette.warning.main),
+                  "&:hover": {
+                    bgcolor: theme.palette.warning.dark,
+                  },
+                }}
+              >
+                Change Password
+              </Button>
               <Button
                 type="button"
                 variant="outlined"

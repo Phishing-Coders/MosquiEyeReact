@@ -5,10 +5,8 @@ import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useClerk } from "@clerk/clerk-react";
 
@@ -17,7 +15,6 @@ const Topbar = () => {
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const [selected, setSelected] = useState("Dashboard");
-  const { logout } = useAuth();
   const { signOut } = useClerk();
 
   const location = useLocation(); // Get current location (URL) from react-router
@@ -51,9 +48,7 @@ const Topbar = () => {
       setSelected("Geography Chart");
     } else if (path === "/profile") {
       setSelected("Profile");
-    } else if (path === "/maps") {
-      setSelected("Maps");
-    }
+    } 
   }, [location]); // Re-run this effect whenever the route changes
 
   // Don't show the sidebar when on the login page
@@ -74,9 +69,6 @@ const Topbar = () => {
         </IconButton>
         <IconButton>
           <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton onClick={() => navigate("/maps")}>
-          <SettingsOutlinedIcon />
         </IconButton>
         <IconButton onClick={() => navigate("/profile")}>
           <PersonOutlinedIcon />
