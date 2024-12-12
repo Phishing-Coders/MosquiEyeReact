@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import eventBus from '../../eventBus'; // Assuming you have an event bus setup in your React project
 import cv from './opencv';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Container, Grid, Card, CardContent, CardActions, Button, Tooltip, Slider, TextField, Dialog, List, ListItem, ListItemText, IconButton, Icon, CircularProgress } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import PublishIcon from '@mui/icons-material/Publish';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Analysis = () => {
 
@@ -62,28 +58,27 @@ const [window, setWindow] = useState(0);
 const [length, setLength] = useState(5);
 const [detailsDialog, setDetailsDialog] = useState(false);
 const location = useLocation();
-const { imageData, imageType: locationImageType, additionalData } = location.state || {};
-const navigate = useNavigate();
+const { imageData, additionalData } = location.state || {};
+
 
 useEffect(() => {
   console.log('useEffect: Initializing component1');
   console.log('useEffect: imageData', imageData);
   console.log('useEffect: additionalData', additionalData);
-  console.log('useEffect: imageType', imageType);
 
   const handleImageType = (imageType) => {
-    console.log('handleImageType: Setting image type parameters2', imageType);
-    if (imageType === 'paper') {
+    console.log('handleImageType: Setting image type parameters2');
+    if (imageType === 0) {
       setThreshValue(116);
       setMinEggRadius(1);
       setMaxEggRadius(8);
       setMaxEggCluster(8);
-    } else if (imageType === 'magnified') {
+    } else if (imageType === 1) {
       setThreshValue(120);
       setMinEggRadius(5);
       setMaxEggRadius(13);
       setMaxEggCluster(30);
-    } else if (imageType === 'micro') {
+    } else {
       setThreshValue(120);
       setMinEggRadius(4);
       setMaxEggRadius(14);
@@ -91,19 +86,13 @@ useEffect(() => {
     }
   };
 
-  console.error("setThreshValue1" );
-
   if (imageData) {
     console.log('useEffect: Image data available, setting analyzed image3');
     setAnalyzedImage(imageData);
   } else {
     console.log('useEffect: No image data available, using fallback image');
-    // const fallbackImage = '../../assets/download.png'; // Ensure this path is correct and accessible
-    // setAnalyzedImage(fallbackImage);
-  }
-
-  if (locationImageType) {
-    handleImageType(locationImageType);
+    const fallbackImage = '/path/to/fallback/image.png'; // Ensure this path is correct and accessible
+    setAnalyzedImage(fallbackImage);
   }
 
   const handleRawImageReady = (data) => {
@@ -119,7 +108,7 @@ useEffect(() => {
     eventBus.off('imageType', handleImageType);
     eventBus.off('rawImageReady', handleRawImageReady);
   };
-}, [imageData, additionalData, locationImageType]);
+}, [imageData, additionalData]);
 
 useEffect(() => {
   if (analyzedImage) {
@@ -134,15 +123,13 @@ const load = async () => {
   eventBus.emit('loadingDialog');
   await new Promise((resolve) => setTimeout(resolve, 2000));
   console.log('load: Load process complete, starting analysis7');
-  console.log('load4: analyzedImage', analyzedImage);
-  analyzeCanvasOrImage("analyzedCanvas"); // Ensure this matches the actual ID
+  analyze();
   turnImages();
 };
   
   const rerender = () => {
     console.log('rerender: Forcing rerender8');
     eventBus.emit('forceRerender');
-    navigate('/scan');
   };
   
   const imageMenu = (index) => {
@@ -160,35 +147,9 @@ const load = async () => {
     setWindow((window - 1) < 0 ? length - 1 : window - 1);
   };
   
-//console.log('load3: analyzedImage', analyzedImage); // Log the value of analyzedImage
-const analyzeCanvasOrImage = async (id) => {
-  console.log("Starting canvas/image analysis with ID:", id);
 
-  // Check if the provided ID is a valid string
-  if (!id || typeof id !== "string") {
-    console.error("Invalid ID provided:", id);
-    throw new Error("Please input a valid canvas or img id");
-  }
-
-  // Get the canvas or image element by ID
-  const canvasElement = document.getElementById(id);
-
-  // Check if the element exists
-  if (!canvasElement) {
-    console.error(`Element with ID "${id}" not found in the DOM.`);
-    throw new Error("Please input a valid canvas or img id");
-  }
-
-  console.log("Element found:", canvasElement);
-
-  // Ensure the canvas has valid dimensions
-  if (canvasElement.width === 0 || canvasElement.height === 0) {
-    console.error("Canvas has invalid dimensions.");
-    return;
-  }
-
+const analyze = async () => {
   console.log('analyze: Starting analysis12');
-  console.log('load5: analyzedImage', analyzedImage)
   if (!analyzedImage) {
     console.error('analyze: No analyzed image available13');
     return;
@@ -203,27 +164,28 @@ const analyzeCanvasOrImage = async (id) => {
   img.onload = () => {
     console.log('analyze: Image loaded successfully');
     
+    // Check if the canvas already exists
+    let canvas = document.getElementById('analyzedCanvas');
+    if (!canvas) {
+      // Create a new canvas if it doesn't exist
+      canvas = document.createElement('canvas');
+      canvas.id = 'analyzedCanvas';
+      document.body.appendChild(canvas);
+    }
+
     // Set canvas dimensions and draw the image
-    canvasElement.width = img.width; // Set canvas width to image width
-    canvasElement.height = img.height; // Set canvas height to image height
-    const ctx = canvasElement.getContext('2d', { willReadFrequently: true }); // Set willReadFrequently to true
-    if (!ctx) {
-      console.error('analyze: Canvas context not found');
-      return;
-    }
-    ctx.drawImage(img, 0, 0, canvasElement.width, canvasElement.height);
-
-    // Ensure the canvas has valid dimensions after drawing the image
-    if (canvasElement.width === 0 || canvasElement.height === 0) {
-      console.error("Canvas has invalid dimensions after drawing the image.");
-      return;
-    }
-
-    console.log(`Canvas dimensions after drawing image: width=${canvasElement.width}, height=${canvasElement.height}`);
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
 
     // Load image into OpenCV using getElementById
-    console.log('analyze11: Canvas element found', id);
-    const src = cv.imread(id); // Use the canvas element ID as a string
+    const canvasElement = document.getElementById('analyzedCanvas');
+    if (!canvasElement) {
+      console.error('analyze: Canvas element not found');
+      return;
+    }
+    const src = cv.imread(canvasElement); // Use the canvas element ID
     const overlay = src.clone();
 
     // Show source image via OpenCV
@@ -355,7 +317,7 @@ const analyzeCanvasOrImage = async (id) => {
     setAvgClusterArea(isNaN(avgClusterArea) ? 0 : avgClusterArea);
     const avgEggsPerCluster = (avgClusterArea / singlesAvg).toFixed(1);
     setAvgEggsPerCluster(isNaN(avgEggsPerCluster) ? 0 : avgEggsPerCluster);
-    setTotalEggs(Number(singlesCount) + Number(singlesCalculated));
+    setTotalEggs(+singlesCount + +singlesCalculated);
 
     // Show images
     cv.imshow('src', src);
@@ -371,7 +333,6 @@ const analyzeCanvasOrImage = async (id) => {
 
     // Show legend image
     const legend = cv.imread('legendImage');
-    
     cv.circle(legend, new cv.Point(50, 50), minEggRadius, blue, 1); // Blue inner circle
     cv.circle(legend, new cv.Point(50, 50), maxEggRadius, red, 1); // Red outer circle
     cv.circle(legend, new cv.Point(50, 50), maxEggCluster, grayColor, 1); // Gray outer circle
@@ -398,15 +359,6 @@ const analyzeCanvasOrImage = async (id) => {
   };
 };
 
-const handleSliderChange = (setter, name) => (_, value) => {
-  console.log(`${name} slider value changed to:`, value);
-  setter(value);
-  analyzeCanvasOrImage("analyzedCanvas");
-};
-
-document.addEventListener("DOMContentLoaded", function () {
-  analyzeCanvasOrImage("analyzedCanvas"); // Ensure this matches the actual ID
-});
 
   const turnImages = async () => {
     console.log('turnImages: Starting image rotation15');
@@ -428,37 +380,34 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   return (
-    <Container fluid="true">
+    <Container fluid>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8} lg={8} xl={9} style={{ display: analysisStarted ? 'block' : 'none' }}>
           <Card className="elevation-5">
             {analyzedImages.map((item, index) => (
               <div key={item.output} style={{ display: window === index ? 'block' : 'none' }}>
                 <canvas id={item.output} className="imageCanvasOuter" style={{ display: showAnalysis ? 'block' : 'none' }}>
-                  {/* <img className="imageCanvasInner" id="analyzedImage" src={analyzedImage} style={{ height: '100px' }} /> */}
+                  <img className="imageCanvasInner" id="analyzedImage" src={analyzedImage} style={{ height: '100px' }} />
                 </canvas>
                 <canvas id={item.source} className="imageCanvasOuter" style={{ display: !showAnalysis ? 'block' : 'none' }}>
-                  {/* <img className="imageCanvasInner" id="analyzedImage" src={analyzedImage} /> */}
+                  <img className="imageCanvasInner" id="analyzedImage" src={analyzedImage} />
                 </canvas>
               </div>
             ))}
           </Card>
-          <div style={{ display: 'none' }}>
-            <canvas id="analyzedCanvas"></canvas> 
-          </div>
           <Card className="my-3">
             <CardContent>
-              <Grid container alignItems="center" justifyContent="space-between">
+              <Grid container alignItems="center">
                 <Grid item>
                   <h1>{analyzedImagesPretty[window]}</h1>
                   <h2>({window + 1} of {analyzedImages.length})</h2>
                 </Grid>
-                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                  <IconButton color="primary" onClick={previous} style={{ background: 'white', borderRadius: '50%', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ArrowBackIosNewIcon />
+                <Grid item>
+                  <IconButton color="primary" onClick={previous}>
+                    <Icon>chevron_left</Icon>
                   </IconButton>
-                  <IconButton color="primary" onClick={next} style={{ background: 'white', borderRadius: '50%', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '10px' }}>
-                    <ArrowForwardIosIcon />
+                  <IconButton color="primary" onClick={next}>
+                    <Icon>chevron_right</Icon>
                   </IconButton>
                 </Grid>
               </Grid>
@@ -477,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </Grid>
                   </Tooltip>
                   <Grid item xs={9}>
-                    <Slider style={{ color: 'white' }} value={threshValue} max={255} onChange={handleSliderChange(setThreshValue, 'Threshold')} />
+                    <Slider value={threshValue} max={255} onChange={(_, value) => setThreshValue(value)} onChangeCommitted={analyze} />
                   </Grid>
                   <Grid item xs={3}>
                     <TextField value={threshValue} onChange={(e) => setThreshValue(e.target.value)} />
@@ -486,12 +435,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 <Grid container>
                   <Tooltip title="Minimum Egg Size Details">
                     <Grid item>
-                      
                       <span>Minimum Egg Size</span>
                     </Grid>
                   </Tooltip>
                   <Grid item xs={9}>
-                    <Slider style={{ color: 'white' }} value={minEggRadius} min={0} max={100} onChange={handleSliderChange(setMinEggRadius, 'Minimum Egg Size')} />
+                    <Slider value={minEggRadius} min={0} max={100} onChange={(_, value) => setMinEggRadius(value)} onChangeCommitted={analyze} />
                   </Grid>
                   <Grid item xs={3}>
                     <TextField value={minEggRadius} onChange={(e) => setMinEggRadius(e.target.value)} />
@@ -504,7 +452,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </Grid>
                   </Tooltip>
                   <Grid item xs={9}>
-                    <Slider style={{ color: 'white' }} value={maxEggRadius} min={0} max={100} onChange={handleSliderChange(setMaxEggRadius, 'Maximum Egg Size')} />
+                    <Slider value={maxEggRadius} min={0} max={100} onChange={(_, value) => setMaxEggRadius(value)} onChangeCommitted={analyze} />
                   </Grid>
                   <Grid item xs={3}>
                     <TextField value={maxEggRadius} onChange={(e) => setMaxEggRadius(e.target.value)} />
@@ -517,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </Grid>
                   </Tooltip>
                   <Grid item xs={9}>
-                    <Slider style={{ color: 'white' }} value={maxEggCluster} min={0} max={100} onChange={handleSliderChange(setMaxEggCluster, 'Maximum Cluster Size')} />
+                    <Slider value={maxEggCluster} min={0} max={100} onChange={(_, value) => setMaxEggCluster(value)} onChangeCommitted={analyze} />
                   </Grid>
                   <Grid item xs={3}>
                     <TextField value={maxEggCluster} onChange={(e) => setMaxEggCluster(e.target.value)} />
@@ -527,9 +475,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   <Tooltip title="Egg Size Scale Details">
                     <Grid item>
                       <p>Egg Size Scale</p>
-                      <p><FiberManualRecordIcon style={{ color: 'blue' }}/> Minimum Egg Size</p>
-                      <p><FiberManualRecordIcon style={{ color: 'red' }}/> Maximum Egg Size</p>
-                      <p><FiberManualRecordIcon style={{ color: 'grey' }}/> Too Large / Too Small</p>
+                      <p><Icon style={{ color: 'rgba(0, 0, 225, 255)' }}>fiber_manual_record</Icon> Minimum Egg Size</p>
+                      <p><Icon style={{ color: 'rgba(225, 0, 0, 255)' }}>fiber_manual_record</Icon> Maximum Egg Size</p>
+                      <p><Icon style={{ color: 'rgba(100, 100, 100, 255)' }}>fiber_manual_record</Icon> Too Large / Too Small</p>
                     </Grid>
                   </Tooltip>
                   <Grid item>
@@ -543,20 +491,14 @@ document.addEventListener("DOMContentLoaded", function () {
           )}
           <Card>
             <CardContent>
-              <Grid container justifyContent="space-between" alignItems="center">
-                <Grid item>
-                  <h4>Analysis</h4>
-                </Grid>
-                <Grid item>
-                  <Button color="primary" onClick={() => setDetailsDialog(true)} style={{  background: 'white' }}>Details</Button>
-                </Grid>
-              </Grid>
+              <h4>Analysis</h4>
+              <Button color="primary" onClick={() => setDetailsDialog(true)}>Details</Button>
               <List>
                 <ListItem>
-                  <ListItemText primary={<span><FiberManualRecordIcon style={{ color: 'blue' }}/> Single Eggs</span>} secondary={singlesCount} />
+                  <ListItemText primary={<span><Icon style={{ color: 'rgba(0, 0, 225, 255)' }}>fiber_manual_record</Icon> Single Eggs</span>} secondary={singlesCount} />
                 </ListItem>
                 <ListItem>
-                  <ListItemText primary={<span><FiberManualRecordIcon style={{ color: 'red' }}/> Calculated from Clusters</span>} secondary={singlesCalculated} />
+                  <ListItemText primary={<span><Icon style={{ color: 'rgba(225, 0, 0, 255)' }}>fiber_manual_record</Icon> Calculated from Clusters</span>} secondary={singlesCalculated} />
                 </ListItem>
                 <ListItem>
                   <ListItemText primary="Total Egg Estimation" secondary={totalEggs} />
@@ -599,18 +541,14 @@ document.addEventListener("DOMContentLoaded", function () {
           </CardActions>
         </Card>
       </Dialog>
-      <div style={{    bottom: 0, width: '80%', display: showBottom ? 'flex' : 'none', justifyContent: 'space-around', height: '50px' }}>
-        <Button color="primary" onClick={rerender} style={{ color: 'white' }}>
+      <div style={{ position: 'fixed', bottom: 0, width: '80%', display: showBottom ? 'flex' : 'none', justifyContent: 'space-around', height: '70px', backgroundColor: '#fff' }}>
+        <Button color="primary" onClick={rerender}>
           <span>Reset</span>
           <RestartAltIcon/>
         </Button>
-        <Button color="primary" onClick={() => setDrawer(!drawer)} style={{ color: 'white' }}>
+        <Button color="primary" onClick={() => setDrawer(!drawer)}>
           <span>Show Filters</span>
           <FilterAltIcon/>
-        </Button>
-        <Button color="primary" style={{ color: 'white' }}>
-          <span>Submit</span>
-          <PublishIcon/>
         </Button>
       </div>
     </Container>
