@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import paperImage from '../../assets/type-paper-thumb.jpg';
 import magnifiedImage from '../../assets/type-magnified-thumb.jpg';
@@ -23,6 +23,7 @@ const Scan = () => {
   const [imageType, setImageType] = useState(null);
   const [showBottomOptions, setShowBottomOptions] = useState(false);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setImageType('paper');
@@ -49,6 +50,13 @@ const Scan = () => {
         setCroppedAreaPixels(null);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageSrc(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';  // Reset the file input
     }
   };
 
@@ -139,13 +147,13 @@ const Scan = () => {
   return (
     <Box m="20px">
       <Header title="Scan" subtitle="Upload Image to algorithmically detect mosquito eggs and egg cluster on ovitrap paper using computer vision." />
-      <Container>
-        <Grid container justify="center">
-          <Grid item xs={10} md={20}>
+      <Container sx={{ mb: 5 }}>
+        <Grid container justifyContent="center" alignItems="center">
+          <Grid item xs={12} md={10}>
             <Container>
-              <h2 align="center">Select the ovitrap image type</h2>
+              <h2 style={{ textAlign: 'center' }}>Select the ovitrap image type</h2>
 
-              <Grid container spacing={3} justify="center" style={{ display: 'flex' }}>
+              <Grid container spacing={3} justifyContent="center" alignItems="center">
                 <Grid item xs={1} md={3} style={{ display: 'flex' }}>
                   <Card
                     onClick={() => handleToggle('paper')}
@@ -227,13 +235,13 @@ const Scan = () => {
       </Container>
 
       {/* image upload */}
-      <Box mb="20px">
+      <Box mb="20px" sx={{ mt: 5 }}>
         <Container>
-          <Grid container justify="center">
-            <Grid item xs={10} md={20}>
+          <Grid container justifyContent="center" alignItems="center">
+            <Grid item xs={12} md={8}>
               <Container>
-                <Grid container spacing={3} justify="center" style={{ display: 'flex' }}>
-                  <Grid item xs={1} md={10} style={{ display: 'flex' }}>
+                <Grid container spacing={3} justifyContent="center" alignItems="center">
+                  <Grid item xs={12}>
                     <Card style={{ width: '100%' }}>
                       <input
                         accept="image/*"
@@ -241,6 +249,7 @@ const Scan = () => {
                         id="upload-image"
                         type="file"
                         onChange={handleFileChange}
+                        ref={fileInputRef}
                       />
                       <label htmlFor="upload-image">
                         {!imageSrc && (
@@ -271,7 +280,7 @@ const Scan = () => {
                             title="Uploaded Image"
                             style={{ objectFit: 'contain' }}
                           />
-                          <Button variant="contained" color="secondary" onClick={() => setImageSrc(null)} startIcon={<Cancel />}>
+                          <Button variant="contained" color="secondary" onClick={handleRemoveImage} startIcon={<Cancel />}>
                             Remove
                           </Button>
                         </div>
