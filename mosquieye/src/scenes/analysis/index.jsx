@@ -1,18 +1,8 @@
-import { Box, Button, Card, Typography, Slider, TextField, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions} from "@mui/material";
-import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-
-import React, { useState, useEffect, useRef } from 'react';
-//import { Button, Card, Typography, Slider, TextField, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { ChevronLeft, ChevronRight, Refresh, Compare, Tune } from '@mui/icons-material';
-import opencv from './opencv';
-
-
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import eventBus from '../../eventBus'; // Assuming you have an event bus setup in your React project
-import cv from './opencv';
+import cv from "@techstark/opencv-js";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Container, Grid, Card, CardContent, CardActions, Button, Tooltip, Slider, TextField, Dialog, List, ListItem, ListItemText, IconButton, Icon, CircularProgress } from '@mui/material';
+import { Container, Grid, Card, CardContent, CardActions, Button, Tooltip, Slider, TextField, Dialog, List, ListItem, ListItemText, IconButton, Icon, CircularProgress, Box, Typography} from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';

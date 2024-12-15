@@ -315,7 +315,7 @@ const Scan = () => {
             handleSubmit,
           }) => (
             <form onSubmit={handleSubmit}>
-              <Box
+              {/* <Box
                 display="grid"
                 gap="30px"
                 gridTemplateColumns="repeat(4, minmax(0, 1fr))"
@@ -401,12 +401,12 @@ const Scan = () => {
                   helperText={touched.address2 && errors.address2}
                   sx={{ gridColumn: "span 4" }}
                 />
-              </Box>
-              <Box display="flex" justifyContent="center" mt="20px">
+              </Box> */}
+              <Box display="flex" justifyContent="center" mt="-10px">
                 <Button type="submit" color="secondary" variant="contained" onClick={() => handleSwitchToAnalysis(values)}>
                   Submit
                 </Button>
-
+                <Box width="20px" />
                 <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
                   to analysis
                 </Button>
