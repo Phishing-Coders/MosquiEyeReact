@@ -19,7 +19,7 @@ const loadGoogleMapsAPI = (apiKey) => {
 const MapPage = () => {
   const [googleMaps, setGoogleMaps] = useState(null);
   const [map, setMap] = useState(null);
-  const apiKey = 'AIzaSyCoaxAUA18nH_mzQi9X7JwSnTXSPpMlmg4'; // Correctly access the API key from environment variables
+  const apiKey = import.meta.env.VITE_APP_GOOGLE_MAP_API;
 
   useEffect(() => {
     // Load Google Maps API once the component is mounted

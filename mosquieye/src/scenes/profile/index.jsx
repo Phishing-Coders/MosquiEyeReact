@@ -1,17 +1,29 @@
 import { Check, PhotoCamera } from "@mui/icons-material";
-import { Avatar, Box, Button, IconButton, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, IconButton, TextField, Typography, CircularProgress } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
 
 const Profile = () => {
+  const { user } = useUser();
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const theme = useTheme(); // Access theme for dark/light mode compatibility
+  const theme = useTheme();
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const [profilePicture, setProfilePicture] = useState("https://via.placeholder.com/120");
+  useEffect(() => {
+    if (user) {
+      const imageUrl = user.imageUrl || user.profileImageUrl;
+      setProfilePicture(imageUrl);
+    }
+  }, [user]);
 
   // Validation schema
   const profileSchema = yup.object().shape({
@@ -32,30 +44,69 @@ const Profile = () => {
   });
 
   const initialValues = {
-    firstName: "Mehrab",
-    lastName: "Bozorgi",
-    email: "Mehrabbozorgi.business@gmail.com",
-    address: "33062 Zboncak isle",
-    contact: "5807779",
-    city: "Mehrab",
-    state: "Bozorgi",
-    password: "sbdfbnd65sfdvb s",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.primaryEmailAddress.emailAddress || "",
+    address: user?.address || "",
+    contact: user?.contact || "",
+    city: user?.city || "",
+    state: user?.state || "",
+    password: "", // For security, don't populate password field
   };
+
+  if(loading){
+    return <CircularProgress />;
+  }
+
+  console.log("User Data: ", user);
 
   
-  const handleFormSubmit = (values) => {
-    console.log("Form Submitted: ", values);
-    alert("Profile updated successfully!");
+  const handleFormSubmit = async (values, { setSubmitting }) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `http://localhost:5000/api/users/${user.id}`,
+        {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          address: values.address,
+          contact: values.contact,
+          city: values.city,
+          state: values.state
+        }
+      );
+
+      if (response.status === 200) {
+        setSaveSuccess(true);
+        // Update the user profile in Clerk if needed
+        await user.update({
+          firstName: values.firstName,
+          lastName: values.lastName,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setSaveSuccess(false);
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
+    }
   };
 
-  const handlePictureChange = (event) => {
+  const handlePictureChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setProfilePicture(reader.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Update profile image using Clerk's API
+        await user.setProfileImage({ file });
+        
+        // Get the updated image URL
+        const newImageUrl = user.imageUrl;
+        setProfilePicture(newImageUrl);
+      } catch (error) {
+        console.error('Error updating profile picture:', error);
+      }
     }
   };
 
@@ -64,7 +115,7 @@ const Profile = () => {
       <Header title="EDIT PROFILE" subtitle="Update your profile information" />
 
       <Box display="flex" gap={2} mb="20px" alignItems="center">
-        <Avatar src={profilePicture} alt="User" sx={{ width: 120, height: 120 }} />
+        <Avatar src={profilePicture || "https://via.placeholder.com/120"} alt="User" sx={{ width: 150, height: 150 }} />
         <Box>
           <IconButton
             component="label"
@@ -99,7 +150,7 @@ const Profile = () => {
         initialValues={initialValues}
         validationSchema={profileSchema}
       >
-        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, isSubmitting }) => (
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"
@@ -187,6 +238,7 @@ const Profile = () => {
                 SelectProps={{ native: true }}
               >
                 <option value="Mehrab">Mehrab</option>
+                <option value="Kabul">Kabul</option>
               </TextField>
               <TextField
                 fullWidth
@@ -203,6 +255,7 @@ const Profile = () => {
                 SelectProps={{ native: true }}
               >
                 <option value="Bozorgi">Bozorgi</option>
+                <option value="Kabul">Kabul</option>
               </TextField>
               <TextField
                 fullWidth
@@ -222,38 +275,40 @@ const Profile = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px" gap={2}>
-  <Button
-    type="button"
-    variant="outlined"
-    sx={{
-      width: "182px",
-      height: "55px",
-      borderColor: theme.palette.warning.main,
-      color: theme.palette.mode === "dark" ? theme.palette.warning.light : theme.palette.warning.dark,
-      "&:hover": {
-        bgcolor: theme.palette.warning.light,
-        borderColor: theme.palette.warning.dark,
-      },
-    }}
-  >
-    Cancel
-  </Button>
-  <Button
-    type="submit"
-    variant="contained"
-    sx={{
-      width: "182px",
-      height: "55px",
-      bgcolor: theme.palette.warning.main,
-      color: theme.palette.getContrastText(theme.palette.warning.main),
-      "&:hover": {
-        bgcolor: theme.palette.warning.dark,
-      },
-    }}
-  >
-    Save
-  </Button>
-</Box>
+              <Button
+                type="button"
+                variant="outlined"
+                disabled={isSubmitting || loading}
+                sx={{
+                  width: "182px",
+                  height: "55px",
+                  borderColor: theme.palette.warning.main,
+                  color: theme.palette.mode === "dark" ? theme.palette.warning.light : theme.palette.warning.dark,
+                  "&:hover": {
+                    bgcolor: theme.palette.warning.light,
+                    borderColor: theme.palette.warning.dark,
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isSubmitting || loading}
+                sx={{
+                  width: "182px",
+                  height: "55px",
+                  bgcolor: theme.palette.warning.main,
+                  color: theme.palette.getContrastText(theme.palette.warning.main),
+                  "&:hover": {
+                    bgcolor: theme.palette.warning.dark,
+                  },
+                }}
+              >
+                {isSubmitting ? "Saving..." : "Save"}
+              </Button>
+            </Box>
           </form>
         )}
       </Formik>

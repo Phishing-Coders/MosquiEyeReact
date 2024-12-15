@@ -16,6 +16,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import { useUser } from '@clerk/clerk-react';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -38,11 +39,14 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { isSignedIn, user, isLoaded } = useUser();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
 
-  const location = useLocation(); // Get current location (URL) from react-router
-
+  if (!isLoaded) {
+    return null;
+  }
   useEffect(() => {
     // Update the selected state based on the current path
     const path = location.pathname;
@@ -133,7 +137,7 @@ const Sidebar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
+                  src={user.imageUrl || "https://via.placeholder.com/120"}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
@@ -144,7 +148,7 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Hanif
+                  {user.firstName} {user.lastName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   Staff

@@ -1,7 +1,7 @@
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from "../../context/AuthContext";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
@@ -17,7 +17,7 @@ import ProgressCircle from "../../components/ProgressCircle";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { logout } = useAuth0();
+  const { logout } = useAuth();
 
   return (
     <Box m="20px">
@@ -50,17 +50,17 @@ const Dashboard = () => {
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 4"
+          gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="150"
-            subtitle="New Location Alert"
-            progress="0.10"
-            increase="+10%"
+            title="12,361"
+            subtitle="Emails Sent"
+            progress="0.75"
+            increase="+14%"
             icon={
               <EmailIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -69,17 +69,17 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 4"
+          gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="1400"
-            subtitle="Latest Eggs Scanned"
-            progress="0.20"
-            increase="+20%"
+            title="431,225"
+            subtitle="Sales Obtained"
+            progress="0.50"
+            increase="+21%"
             icon={
               <PointOfSaleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -88,16 +88,16 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 4"
+          gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="15"
-            subtitle="New Staff"
-            progress="0.15"
+            title="32,441"
+            subtitle="New Clients"
+            progress="0.30"
             increase="+5%"
             icon={
               <PersonAddIcon
@@ -106,7 +106,25 @@ const Dashboard = () => {
             }
           />
         </Box>
-        
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title="1,325,134"
+            subtitle="Traffic Received"
+            progress="0.80"
+            increase="+43%"
+            icon={
+              <TrafficIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
 
         {/* ROW 2 */}
         <Box
@@ -208,7 +226,7 @@ const Dashboard = () => {
           p="30px"
         >
           <Typography variant="h5" fontWeight="600">
-            Mosquito Eggs
+            Campaign
           </Typography>
           <Box
             display="flex"
@@ -222,9 +240,9 @@ const Dashboard = () => {
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
             >
-              10000 Total Scanned
+              $48,352 revenue generated
             </Typography>
-            <Typography>Avegrage All Scanned Mosquito Eggs</Typography>
+            <Typography>Includes extra misc expenditures and costs</Typography>
           </Box>
         </Box>
         <Box

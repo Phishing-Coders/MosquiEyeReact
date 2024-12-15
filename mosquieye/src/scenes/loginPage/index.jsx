@@ -1,165 +1,104 @@
-import { Box, Button, Grid, Snackbar, Alert, Typography } from "@mui/material"; // Ensure Grid is imported
+import { Box, Button, Grid, Snackbar, Alert, Typography, TextField } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation to track the location
-import { useAuth0 } from "@auth0/auth0-react"; // Import useAuth0 hook
-
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import background from "../../assets/medicalbackground1.png";
+import logo from "../../assets/favicon.ico";
+import { SignIn } from "@clerk/clerk-react";
 
 const LoginPage = () => {
-  const { loginWithRedirect, isAuthenticated } = useAuth0(); // Destructure loginWithRedirect from useAuth0
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // To track the URL and detect back navigation
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
+  const { login } = useAuth();
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // // Simulate a login process
-    // if (username === "admin" && password === "password") {
-    //   setIsAuthenticated(true); // Set authentication state
-    //   navigate("/dashboard"); // Navigate to the dashboard on successful login
-    // } else {
-    //   setError("Invalid username or password");
-    //   setOpenSnackbar(true);
-    // }
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
+    if (username === "admin" && password === "password") {
+      login({ username, role: 'admin' });
+      navigate('/dashboard');
+    } else {
+      setError("Invalid username or password");
+      setOpenSnackbar(true);
+    }
   };
 
   return (
     <Box>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        {/* Left-side background image */}
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
+      <Grid 
+        container 
+        component="main" 
+        sx={{ 
+          height: "100vh",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        {/* Left side background */}
+        <Grid item xs={false} sm={4} md={7} 
           sx={{
             backgroundImage: `url(${background})`,
             backgroundRepeat: "no-repeat",
-            backgroundColor: (t) =>
-              t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
             backgroundSize: "cover",
             backgroundPosition: "center",
+            height: '100%',
+            display: { xs: 'none', sm: 'block' }
           }}
         />
-        
-        {/* Right-side login form */}
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={5}
-          component={Box}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
+        {/* Right side login form */}
+        <Grid item xs={12} sm={8} md={5} 
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%'
+          }}
         >
-          <Box
-            sx={{
-              mt: 8,
-              mx: 4,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+          <Box 
+            sx={{ 
+              width: '80%',
+              maxWidth: '400px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
             }}
           >
-            <Typography component="h1" variant="h5" sx={{ fontSize: 20 }}>
-              LOGIN
-            </Typography>
-            <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
-              Welcome to Moquieye Web Application
-            </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              {/* <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                autoComplete="username"
-                autoFocus
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LockIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              /> */}
-              <Button
-                // type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                onClick={() => loginWithRedirect()}
-                sx={{
-                  mt: 3,
-                  mb: 2,
-                  background:
-                    "linear-gradient(180deg, rgb(145,129,244) 0%, rgb(80,56,237) 100%)",
-                }}
-              >
-                Login with Auth0
-              </Button>
-              {/* <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{
-                  mt: 0,
-                  mb: 2,
-                  background:
-                    "linear(180deg, rgb(255,0,0) 0%, rgb(80,56,237) 100%)",
-                }}
-              >
-                Forgot Password?
-              </Button> */}
-            </Box>
-            <Snackbar
-              open={openSnackbar}
-              autoHideDuration={6000}
-              onClose={handleCloseSnackbar}
+            {/* <Typography variant="h4" sx={{ mb: 4 }}>Login</Typography> */}
+            <Box
+              component="img"
+              src={logo}
+              alt="MosquiEye Logo"
+              sx={{
+                width: '150px', // Adjust size as needed
+                height: 'auto',
+                mb: 4,
+                borderRadius: '50%' // Make the image round
+              }}
+            />
+            <Box 
+              component="form" 
+              onSubmit={handleSubmit}
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                '& .cl-card': { // Clerk's default class for the sign-in card
+                  padding: { xs: '1rem', sm: '2rem' },
+                  width: '100%',
+                  maxWidth: '100%',
+                  margin: 0,
+                  '& > div': {
+                    padding: 0
+                  }
+                }
+              }}
             >
-              <Alert onClose={handleCloseSnackbar} severity="error">
-                {error}
-              </Alert>
-            </Snackbar>
+              <SignIn />
+            </Box>
           </Box>
         </Grid>
       </Grid>
