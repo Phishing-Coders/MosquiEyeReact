@@ -93,7 +93,7 @@ const MapPage = () => {
             }
 
             // Clear out the old markers.
-            marker.setMap(null);
+            //marker.setMap(null);
 
             // For each place, get the icon, name, and location.
             const bounds = new googleMaps.LatLngBounds();
@@ -148,31 +148,28 @@ const MapPage = () => {
     <div style={{ height: '100vh', margin: 0 }}>
       {/* Search input with native X button */}
       <input
-        id="pac-input"
-        className="controls"
-        type="text"
-        placeholder="Search Box"
-        style={{
-          boxSizing: `border-box`,
-          border: `1px solid transparent`,
-          width: `270px`,
-          height: `32px`,
-          marginTop: `8px`,
-          padding: `0 12px`,
-          borderRadius: `18px`,
-          boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-          fontSize: `14px`,
-          outline: `black`,
-          textOverflow: `ellipses`,
-          position: `absolute`,
-          top: `10px`,
-          left: `40%`,
-          marginLeft: `-120px`,
-          // Allow the X to appear by not disabling browser default styles
-          WebkitAppearance: 'none', // Required for Safari
-          MozAppearance: 'none', // Required for Firefox
-        }}
-      />
+      id="pac-input"
+      className="controls"
+      type="search" // Use "search" type for native clear button
+      placeholder="Search Box"
+      style={{
+      boxSizing: 'border-box',
+      border: '1px solid transparent',
+      width: '270px',
+      height: '32px',
+      marginTop: '8px',
+      padding: '0 12px',
+      borderRadius: '18px',
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
+      fontSize: '14px',
+      outline: 'black',
+      textOverflow: 'ellipsis',
+      position: 'absolute',
+      top: '10px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+    }}
+  />
       {/* Container for Google Map */}
       <div id="google-map" style={{ height: '93%' }}></div>
     </div>
