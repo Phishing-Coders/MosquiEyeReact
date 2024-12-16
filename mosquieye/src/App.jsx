@@ -22,6 +22,7 @@ import Profile from "./scenes/profile";
 import MapPage from "./scenes/maps";
 import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
+import Heatmap from "./scenes/heatmap";
 
 import { setupIonicReact } from "@ionic/react";
 
@@ -144,6 +145,12 @@ function App() {
               path="/analysis"
               element={
                 isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+              path="/heatmap"
+              element={
+                isAuthenticated ? <Heatmap /> : <Navigate to="/" replace />
               }
               />
             </Routes>
