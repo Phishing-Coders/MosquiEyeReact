@@ -22,6 +22,7 @@ import Profile from "./scenes/profile";
 import MapPage from "./scenes/maps";
 import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
+import QRScan from "./scenes/qrscan";
 
 import { setupIonicReact } from "@ionic/react";
 import { IonButton, IonDatetime } from '@ionic/react';
@@ -142,6 +143,12 @@ function App() {
               path="/scan"
               element={
                 isAuthenticated ? <Scan /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+              path="/qrscan"
+              element={
+                isAuthenticated ? <QRScan /> : <Navigate to="/" replace />
               }
               />
               <Route
