@@ -234,7 +234,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Heatmap"
+              title="HeatMap"
               to="/heatmap"
               icon={<MapOutlinedIcon />}
               selected={selected}

@@ -136,6 +136,12 @@ function App() {
                 }
               />
               <Route
+                path="/heatmap"
+                element={
+                  isAuthenticated ? <Heatmap /> : <Navigate to="/" replace />
+                }
+              />
+              <Route
               path="/scan"
               element={
                 isAuthenticated ? <Scan /> : <Navigate to="/" replace />
