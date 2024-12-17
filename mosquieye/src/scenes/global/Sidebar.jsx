@@ -16,6 +16,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 import { useUser } from '@clerk/clerk-react';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -74,6 +75,8 @@ const Sidebar = () => {
       setSelected("Geography Chart");
     } else if (path === "/scan") {
       setSelected("Scan");
+    } else if (path === "/qrscan") { // Add this line if you have a specific route for QR scan
+      setSelected("QR Scan");
     }
   }, [location]); // Re-run this effect whenever the route changes
 
@@ -206,6 +209,13 @@ const Sidebar = () => {
               title="Scan"
               to="/scan"
               icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+             <Item
+              title="QR Scan" // Add the QR Scan item here
+              to="/qrscan" // Ensure this matches your routing
+              icon={<QrCodeIcon />}
               selected={selected}
               setSelected={setSelected}
             />

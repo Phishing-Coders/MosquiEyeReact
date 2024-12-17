@@ -33,6 +33,7 @@
     "axios": "^1.7.7",
     "eslint": "^9.15.0",
     "formik": "^2.4.6",
+    "html5-qrcode": "^2.3.8",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.2",
     "react": "^18.3.1",
