@@ -10,7 +10,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { useClerk } from "@clerk/clerk-react";
+import { useClerk, UserButton } from "@clerk/clerk-react";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -75,16 +75,8 @@ const Topbar = () => {
         <IconButton>
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton onClick={() => navigate("/maps")}>
-          <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton onClick={() => navigate("/profile")}>
-          <PersonOutlinedIcon />
-        </IconButton>
-        
-        {/* Logout Button with Door Icon */}
-        <IconButton onClick={() => signOut()}>
-          <ExitToAppIcon /> {/* Door icon for logout */}
+        <IconButton >
+          <UserButton />
         </IconButton>
       </Box>
     </Box>
