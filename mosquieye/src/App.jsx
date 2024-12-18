@@ -2,6 +2,7 @@ import '@ionic/react/css/core.css';
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
@@ -23,9 +24,12 @@ import MapPage from "./scenes/maps";
 import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
 import QRScan from "./scenes/qrscan";
+import { useMediaQuery, Box } from "@mui/material";
 
+import MobileNavigation from "./components/MobileNavigation";
 import { setupIonicReact } from "@ionic/react";
-import { IonButton, IonDatetime } from '@ionic/react';
+import { IonApp, IonContent } from '@ionic/react';
+import { useUser } from '@clerk/clerk-react';
 
 setupIonicReact();
 
@@ -33,10 +37,30 @@ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const { isAuthenticated, isLoading } = useAuth();
+  const { user } = useUser();
+  const isMobile = useMediaQuery("(max-width:600px)");
 
-  // if (!isLoaded) {
-  //   return <div>Loading...</div>;
-  // }
+  const userRole = user?.organizationMemberships?.[0]?.role;
+
+  const routes = [
+    { path: "/dashboard", element: <Dashboard />, permission: "dashboard" },
+    { path: "/team", element: <Team />, permission: "team" },
+    { path: "/contacts", element: <Contacts />, permission: "contacts" },
+    { path: "/invoices", element: <Invoices />, permission: "invoices" },
+    { path: "/form", element: <Form />, permission: "form" },
+    { path: "/bar", element: <Bar/>, permission: "bar" },
+    { path: "/pie", element: <Pie/>, permission: "pie" },
+    { path: "/line", element: <Line/>, permission: "line" },
+    { path: "/faq", element: <FAQ />, permission: "faq" },
+    { path: "calendar", element: <Calendar />, permission: "calendar" },
+    { path: "/geography", element: <Geography />, permission: "geography" },
+    { path: "/profile", element: <Profile />, permission: "profile" },
+    { path: "/maps", element: <MapPage />, permission: "maps" },
+    { path: "/scan", element: <Scan />, permission: "scan" },
+    { path: "/analysis", element: <Analysis />, permission: "analysis" },
+    { path: "/qrscan", element: <QRScan />, permission: "qrscan" },
+
+  ];
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -46,6 +70,12 @@ function App() {
           {isAuthenticated && <Sidebar isSidebar={isSidebar} />}
           <main className="content">
             {isAuthenticated && <Topbar setIsSidebar={setIsSidebar} />}
+            <Box sx={{ 
+                height: '100%',
+                overflow: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                pb: isMobile ? '56px' : 0
+              }}>
             <Routes>
               <Route
                 path="/"
@@ -57,7 +87,24 @@ function App() {
                   )
                 }
               />
-              <Route
+
+              {routes.map(({ path, element, permission }) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={
+                    <ProtectedRoute
+                      element={element}
+                      permission={permission}
+                    />
+                  }
+                />
+              ))}
+
+              {/* Fallback route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+
+              {/* <Route
                 path="/dashboard"
                 element={
                   isAuthenticated ? (
@@ -156,8 +203,10 @@ function App() {
               element={
                 isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
               }
-              />
+              /> */}
             </Routes>
+            </Box>
+            {isAuthenticated && isMobile && <MobileNavigation />}
           </main>
         </div>
       </ThemeProvider>
