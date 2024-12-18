@@ -13,7 +13,7 @@ import { Box, Button, TextField, Slider, Container, Grid, Card, CardMedia, CardC
 import { useNavigate } from 'react-router-dom';
 
 const Scan = () => {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
+  const isMobile = useMediaQuery("(min-width:600px)");
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -145,24 +145,39 @@ const Scan = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box m={isMobile ? "10px" : "20px"}>
       <Header title="Scan" subtitle="Upload Image to algorithmically detect mosquito eggs and egg cluster on ovitrap paper using computer vision." />
-      <Container sx={{ mb: 5 }}>
+      <Container 
+        maxWidth="lg" 
+        sx={{ 
+          mt: 2, 
+          mb: isMobile ? 8 : 5,
+          px: isMobile ? 1 : 3 // Adjust padding for mobile
+        }}
+      >
         <Grid container justifyContent="center" alignItems="center">
           <Grid item xs={12} md={10}>
-            <Container>
-              <h2 style={{ textAlign: 'center' }}>Select the ovitrap image type</h2>
+              {/* <h2 style={{ textAlign: 'center' }}>Select the ovitrap image type</h2> */}
+              <Typography
+                variant={isMobile ? "h5" : "h4"}
+                align="center"
+                sx={{ mb: 3 }}
+              >
+                Select the ovitrap image type
+              </Typography>
 
-              <Grid container spacing={3} justifyContent="center" alignItems="center">
+              <Grid container spacing={2} justifyContent="center">
+                {/*Paper Type Card*/}
                 <Grid item xs={1} md={3} style={{ display: 'flex' }}>
-                  <Card
-                    onClick={() => handleToggle('paper')}
-                    style={{
-                      border: imageType === 'paper' ? '2px solid white' : 'none',
-                      boxShadow: imageType === 'paper' ? '0px 4px 20px rgba(0, 0, 0, 0.1)' : '',
-                      flex: 1 // Ensure the card takes full height
-                    }}
-                  >
+                <Card
+                  onClick={() => handleToggle('paper')}
+                  sx={{
+                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
+                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    height: '100%',
+                    transition: '0.3s'
+                  }}
+                >
                     <CardMedia
                       component="img"
                       alt="Paper"
@@ -180,14 +195,15 @@ const Scan = () => {
                 </Grid>
 
                 <Grid item xs={1} md={3} style={{ display: 'flex' }}>
-                  <Card
-                    onClick={() => handleToggle('magnified')}
-                    style={{
-                      border: imageType === 'magnified' ? '2px solid white' : 'none',
-                      boxShadow: imageType === 'magnified' ? '0px 4px 20px rgba(0, 0, 0, 0.1)' : '',
-                      flex: 1 // Ensure the card takes full height
-                    }}
-                  >
+                <Card
+                  onClick={() => handleToggle('paper')}
+                  sx={{
+                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
+                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    height: '100%',
+                    transition: '0.3s'
+                  }}
+                >
                     <CardMedia
                       component="img"
                       alt="Magnified"
@@ -205,14 +221,15 @@ const Scan = () => {
                 </Grid>
 
                 <Grid item xs={1} md={3} style={{ display: 'flex' }}>
-                  <Card
-                    onClick={() => handleToggle('micro')}
-                    style={{
-                      border: imageType === 'micro' ? '2px solid white' : 'none',
-                      boxShadow: imageType === 'micro' ? '0px 4px 20px rgba(0, 0, 0, 0.1)' : '',
-                      flex: 1 // Ensure the card takes full height
-                    }}
-                  >
+                <Card
+                  onClick={() => handleToggle('paper')}
+                  sx={{
+                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
+                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    height: '100%',
+                    transition: '0.3s'
+                  }}
+                >
                     <CardMedia
                       component="img"
                       alt="Micro"
@@ -229,7 +246,6 @@ const Scan = () => {
                   </Card>
                 </Grid>
               </Grid>
-            </Container>
           </Grid>
         </Grid>
       </Container>

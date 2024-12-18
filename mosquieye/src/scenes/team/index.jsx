@@ -17,24 +17,29 @@ const Team = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/users/all');
-        const usersWithId = response.data.map(user => ({
+        const usersWithId = response.data.map((user, index) => ({
+          rowNumber: index + 1,
           id: user._id, // Use the MongoDB ObjectId as the id
           name: `${user.firstName} ${user.lastName}`,
           email: user.email,
-          access: 'user', // Assuming a default access level, adjust as needed
+          access: 'admin', // Assuming a default access level, adjust as needed
           ...user
         }));
         setUsers(usersWithId);
-        console.log('Fetched users:', usersWithId);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     };
-
     fetchUsers();
   }, []);
 
   const columns = [
+    {
+      field: "rowNumber",
+      headerName: "#",
+      width: 50,
+      sortable: false,
+    },
     { field: "id", headerName: "ID", flex: 1 },
     {
       field: "name",

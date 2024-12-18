@@ -1,11 +1,14 @@
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { Link, useLocation } from "react-router-dom"; // Import necessary hooks
 import "react-pro-sidebar/dist/css/styles.css";
 import { useState, useEffect } from "react"; // Import useState and useEffect
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+import ScannerIcon from '@mui/icons-material/Scanner';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -31,13 +34,15 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       onClick={() => setSelected(title)}
       icon={icon}
     >
-      <Typography>{title}</Typography>
-      <Link to={to} />
+      <Link to={to}>
+        <Typography>{title}</Typography>
+      </Link>
     </MenuItem>
   );
 };
 
 const Sidebar = () => {
+  const isMobile = useMediaQuery("(max-width:600px)");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { isSignedIn, user, isLoaded } = useUser();
@@ -45,9 +50,7 @@ const Sidebar = () => {
   const [selected, setSelected] = useState("Dashboard");
   const location = useLocation();
 
-  if (!isLoaded) {
-    return null;
-  }
+  const userRole = user?.organizationMemberships?.[0]?.role;
   useEffect(() => {
     // Update the selected state based on the current path
     const path = location.pathname;
@@ -78,12 +81,25 @@ const Sidebar = () => {
     } else if (path === "/qrscan") { // Add this line if you have a specific route for QR scan
       setSelected("QR Scan");
     }
-  }, [location]); // Re-run this effect whenever the route changes
+  }, [location.pathname]); // Re-run this effect whenever the route changes
+
+  // Don't render sidebar on mobile
+  if (isMobile) {
+    return null;
+  }
+
+  if (!isLoaded) {
+    return null;
+  }
 
   // Don't show the sidebar when on the login page
   if (location.pathname === "/") {
     return null; // Don't render the sidebar if on the login page
   }
+
+  console.log("Current user role:", userRole);
+  console.log("User object:", user);
+  console.log("Organization memberships:", user?.organizationMemberships);
 
   return (
     <Box
@@ -134,27 +150,36 @@ const Sidebar = () => {
           </MenuItem>
 
           {!isCollapsed && (
-            <Box mb="25px">
+            <Box mb={isMobile ? "15px" : "25px"}>
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
-                  width="100px"
-                  height="100px"
+                  width={isMobile ? "80px" : "100px"}
+                  height={isMobile ? "80px" : "100px"}
                   src={user.imageUrl || "https://via.placeholder.com/120"}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                  style={{ 
+                    cursor: "pointer", 
+                    borderRadius: "50%",
+                    padding: isMobile ? "5px" : "0"
+                  }}
                 />
               </Box>
               <Box textAlign="center">
                 <Typography
-                  variant="h2"
+                  variant={isMobile ? "h3" : "h2"}
                   color={colors.grey[100]}
                   fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
+                  sx={{ m: isMobile ? "5px 0 0 0" : "10px 0 0 0" }}
                 >
                   {user.firstName} {user.lastName}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Staff
+                <Typography 
+                  variant={isMobile ? "h6" : "h5"} 
+                  color={colors.greenAccent[500]}
+                >
+                  {userRole?.replace('org:', '').split('_').map(
+                    word => word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}
                 </Typography>
               </Box>
             </Box>
