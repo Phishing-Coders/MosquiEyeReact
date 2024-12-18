@@ -24,6 +24,7 @@ const Scan = () => {
   const [showBottomOptions, setShowBottomOptions] = useState(false);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const bottomSectionRef = useRef(null);  // Add this line
 
   useEffect(() => {
     setImageType('paper');
@@ -48,6 +49,14 @@ const Scan = () => {
         // Reset other states related to cropping when a new image is uploaded
         setCroppedImage(null);
         setCroppedAreaPixels(null);
+        
+        // Add scroll behavior
+        setTimeout(() => {
+          bottomSectionRef.current?.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }, 100);
       };
       reader.readAsDataURL(file);
     }
@@ -295,12 +304,9 @@ const Scan = () => {
             </Grid>
           </Grid>
         </Container>
-      </Box>
+      </Box>      
 
-      {/* image information, get user information from database */}
-      {/* enable gps function */}
-
-      <Box m="20px">
+      <Box m="20px" ref={bottomSectionRef}>  
         <Formik
           onSubmit={handleFormSubmit}
           initialValues={initialValues}
@@ -403,13 +409,13 @@ const Scan = () => {
                 />
               </Box> */}
               <Box display="flex" justifyContent="center" mt="-10px">
-                <Button type="submit" color="secondary" variant="contained" onClick={() => handleSwitchToAnalysis(values)}>
+                <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
                   Submit
                 </Button>
-                <Box width="20px" />
+                {/* <Box width="20px" />
                 <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
                   to analysis
-                </Button>
+                </Button> */}
               </Box>
             </form>
           )}

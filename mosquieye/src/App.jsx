@@ -22,6 +22,8 @@ import Profile from "./scenes/profile";
 import MapPage from "./scenes/maps";
 import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
+import AnalysisHistory from './scenes/analysisHistory';
+
 
 import { setupIonicReact } from "@ionic/react";
 import { IonButton, IonDatetime } from '@ionic/react';
@@ -148,6 +150,12 @@ function App() {
               path="/analysis"
               element={
                 isAuthenticated ? <Analysis /> : <Navigate to="/" replace />
+              }
+              />
+              <Route
+              path="/analysis-history"
+              element={
+                isAuthenticated ? <AnalysisHistory /> : <Navigate to="/" replace />
               }
               />
             </Routes>

@@ -6,10 +6,17 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import User from './models/Users.js';
 import userRoutes from './routes/user.js';
+import imagesRoutes from './routes/images.js';
 
 dotenv.config();
 
 const app = express();
+
+// Increase payload size limits - add these before other middleware
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 // Debug middleware
 app.use((req, res, next) => {
@@ -74,12 +81,37 @@ app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (r
 // Regular routes
 app.use(express.json());
 app.use('/api/users', userRoutes);
+app.use('/api/images', imagesRoutes);
 
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// Update MongoDB connection with retry logic
+const connectWithRetry = () => {
+  mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    retryWrites: true,
+    w: 'majority',
+    retryReads: true
+  })
+  .then(() => {
+    console.log('MongoDB Connected Successfully');
+    console.log('Connection State:', mongoose.connection.readyState);
+    console.log('Database Name:', mongoose.connection.name);
+    
+    // Only start server after successful database connection
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.log('Retrying connection in 5 seconds...');
+    setTimeout(connectWithRetry, 5000);
+  });
+};
+
+// Initial connection attempt
+connectWithRetry();
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
