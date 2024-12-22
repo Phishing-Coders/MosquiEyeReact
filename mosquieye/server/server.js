@@ -34,30 +34,34 @@ app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (r
         const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET_KEY);
         const evt = wh.verify(payloadString, svixHeaders);
         const eventData = JSON.parse(payloadString);
-        
+
         console.log('Event type:', eventData.type);
         console.log('Event data:', eventData.data);
 
-        if (eventData.type === 'user.created') {
+        if (eventData.type === 'user.created' || eventData.type === 'user.updated') {
             const userData = eventData.data;
             const userDetails = {
                 clerkUserId: userData.id,
                 email: userData.email_addresses[0].email_address,
                 firstName: userData.first_name,
-                lastName: userData.last_name
+                lastName: userData.last_name,
+                imageUrl: userData.image_url
             };
 
             console.log('Saving user to MongoDB:', userDetails);
 
-            const newUser = new User(userDetails);
-            await newUser.save();
+            const updatedUser = await User.findOneAndUpdate(
+                { clerkUserId: userDetails.clerkUserId },
+                userDetails,
+                { new: true, upsert: true, runValidators: true }
+            );
 
-            console.log('User saved successfully:', newUser);
+            console.log('User saved successfully:', updatedUser);
             
             res.json({
                 success: true,
                 message: 'User saved to MongoDB',
-                user: newUser
+                user: updatedUser
             });
         } else {
             res.json({ message: 'Event processed but not saved' });
