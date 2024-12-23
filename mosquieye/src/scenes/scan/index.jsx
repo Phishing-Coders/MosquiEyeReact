@@ -11,6 +11,7 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Box, Button, TextField, Slider, Container, Grid, Card, CardMedia, CardContent, Typography, Dialog } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';  // Update this line
 
 const Scan = () => {
   const isMobile = useMediaQuery("(min-width:600px)");

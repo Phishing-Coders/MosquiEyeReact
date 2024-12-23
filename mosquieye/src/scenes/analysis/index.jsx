@@ -507,7 +507,7 @@ const handleSubmit = async () => {
 
 // Add history navigation function
 const navigateToHistory = () => {
-  navigate('/analysis-history');
+  navigate('/analysishistory');
 };
 
   return (
