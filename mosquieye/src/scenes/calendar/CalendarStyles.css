@@ -1,0 +1,53 @@
+/* Additional global styles for FullCalendar */
+.fc-more-popover {
+  background-color: #1F2A40 !important;
+  border-color: #3e4396 !important;
+}
+
+.fc-popover-header {
+  background-color: #3e4396 !important;
+  color: white !important;
+}
+
+.fc-popover-body {
+  color: white !important;
+}
+
+.fc-daygrid-more-link {
+  background-color: #3e4396 !important;
+  color: white !important;
+  margin: 2px !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+}
+
+.fc-daygrid-more-link:hover {
+  background-color: #4c52ad !important;
+  text-decoration: none !important;
+}
+
+/* Ensure event titles are visible */
+.fc-event-title {
+  color: white !important;
+}
+
+/* Style for the popover close button */
+.fc-popover-close {
+  color: white !important;
+  opacity: 0.8 !important;
+}
+
+.fc-popover-close:hover {
+  opacity: 1 !important;
+}
+
+/* Style for "done" events */
+.fc-event-done {
+  background-color: #4caf50 !important; /* Green background for done events */
+  border-color: #388e3c !important; /* Darker green border */
+}
+
+.fc-event-done .fc-event-title {
+  color: white !important; /* White text for visibility */
+}

@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import User from './models/Users.js';
 import userRoutes from './routes/user.js';
 import imagesRoutes from './routes/images.js';
+import schedulesRouter from './routes/schedules.js'; // Ensure this import exists
 
 dotenv.config();
 
@@ -82,6 +83,7 @@ app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (r
 app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/images', imagesRoutes);
+app.use('/api/schedules', schedulesRouter); // Ensure this line exists
 
 // Update MongoDB connection with retry logic
 const connectWithRetry = () => {
