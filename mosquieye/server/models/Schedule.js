@@ -39,11 +39,12 @@ const scheduleSchema = new mongoose.Schema({
   },
   startTime: {
     type: String,
-    required: function() { 
-      return this.type === 'single';
-    },
+    required: true,
     validate: {
       validator: function(v) {
+        if (this.isFullDay) {
+          return v === '00:00';
+        }
         return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
       },
       message: props => `${props.value} is not a valid time format!`
@@ -51,9 +52,12 @@ const scheduleSchema = new mongoose.Schema({
   },
   endTime: {
     type: String,
-    required: true, // Make required for all types
+    required: true,
     validate: {
       validator: function(v) {
+        if (this.isFullDay) {
+          return v === '23:59';
+        }
         return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
       },
       message: props => `${props.value} is not a valid time format!`
