@@ -261,7 +261,7 @@ const Scan = () => {
       </Container>
 
       {/* image upload */}
-      <Box mb="20px" sx={{ mt: 5 }}>
+      <Box mb="20px" sx={{ mt: -5 }}>
         <Container>
           <Grid container justifyContent="center" alignItems="center">
             <Grid item xs={12} md={8}>
