@@ -19,6 +19,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import CompareIcon from '@mui/icons-material/Compare';
 import QrCodeIcon from "@mui/icons-material/QrCode";
 import { useUser } from '@clerk/clerk-react';
 
@@ -233,7 +234,7 @@ const Sidebar = () => {
             <Item
               title="Scan"
               to="/scan"
-              icon={<PersonOutlinedIcon />}
+              icon={<CompareIcon />}
               selected={selected}
               setSelected={setSelected}
             />

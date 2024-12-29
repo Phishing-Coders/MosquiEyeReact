@@ -58,6 +58,7 @@ function App() {
     { path: "/maps", element: <MapPage />, permission: "maps" },
     { path: "/scan", element: <Scan />, permission: "scan" },
     { path: "/analysis", element: <Analysis />, permission: "analysis" },
+    
     { path: "/qrscan", element: <QRScan />, permission: "qrscan" },
 
   ];
