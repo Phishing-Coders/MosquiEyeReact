@@ -27,7 +27,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://your-frontend-domain.vercel.app']
+    : ['http://localhost:3000'],
+  credentials: true
+}));
 
 // Important: Raw body parser must come before express.json()
 app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (req, res) => {

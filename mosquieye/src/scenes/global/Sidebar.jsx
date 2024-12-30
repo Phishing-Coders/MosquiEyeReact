@@ -8,7 +8,6 @@ import { useState, useEffect } from "react"; // Import useState and useEffect
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import CompareIcon from "@mui/icons-material/Compare";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -103,6 +102,12 @@ const menuConfig = [
         title: "Map",
         to: "/maps",
         icon: <MapOutlinedIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      },
+      {
+        title: "Analysis History",
+        to: "/analysisHistory",
+        icon: <TimelineOutlinedIcon />,
         permissions: ["org:health_office", "org:operations_team"]
       }
     ]

@@ -30,7 +30,7 @@ const AnalysisHistory = () => {
 
   const fetchAnalyses = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/images');
+      const response = await axios.get('/api/images');
       setAnalyses(response.data.images);
       setLoading(false);
     } catch (error) {
@@ -55,9 +55,9 @@ const AnalysisHistory = () => {
   return (
     <Box m="20px">
       <Box display="flex" alignItems="center" gap={2} mb={4}>
-        <IconButton onClick={handleBack}>
+        {/* <IconButton onClick={handleBack}>
           <ArrowBackIcon />
-        </IconButton>
+        </IconButton> */}
         <Header title="ANALYSIS HISTORY" subtitle="View all previous analyses" />
       </Box>
 
