@@ -90,6 +90,57 @@ app.post('/api/webhooks', bodyParser.raw({ type: 'application/json' }), async (r
 
 // Regular routes
 app.use(express.json());
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>MosquiEye API Server</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+          }
+          .container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          h1 { color: #333; }
+          .status { 
+            color: #22c55e;
+            font-weight: bold;
+          }
+          .endpoints {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🦟 MosquiEye API Server</h1>
+          <p class="status">Status: Running</p>
+          <div class="endpoints">
+            <h2>Available Endpoints:</h2>
+            <ul>
+              <li>/api/images - Image analysis endpoints</li>
+              <li>/api/users - User management endpoints</li>
+              <li>/api/schedules - Schedule management endpoints</li>
+            </ul>
+          </div>
+          <p>For more information, visit our <a href="https://github.com/Phishing-Coders/MosquiEyeReact">documentation</a></p>
+        </div>
+      </body>
+    </html>
+  `);
+});
 app.use('/api/users', userRoutes);
 app.use('/api/images', imagesRoutes);
 app.use('/api/schedules', schedulesRouter); // Ensure this line exists
