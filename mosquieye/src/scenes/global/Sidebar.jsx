@@ -93,12 +93,6 @@ const menuConfig = [
         permissions: ["org:health_office", "org:operations_team"]
       },
       {
-        title: "Profile Form",
-        to: "/form",
-        icon: <PersonOutlinedIcon />,
-        permissions: ["org:health_office"]
-      },
-      {
         title: "Calendar",
         to: "/calendar",
         icon: <CalendarTodayOutlinedIcon />,
@@ -108,12 +102,6 @@ const menuConfig = [
         title: "Map",
         to: "/maps",
         icon: <MapOutlinedIcon />,
-        permissions: ["org:health_office", "org:operations_team"]
-      },
-      {
-        title: "FAQ Page",
-        to: "/faq",
-        icon: <HelpOutlineOutlinedIcon />,
         permissions: ["org:health_office", "org:operations_team"]
       }
     ]
