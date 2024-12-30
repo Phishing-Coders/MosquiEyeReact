@@ -23,7 +23,7 @@ import Profile from "./scenes/profile";
 import MapPage from "./scenes/maps";
 import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
-import QRScan from "./scenes/qrscan";
+import QRScan from "./scenes/qrscan/index";
 import AnalysisHistory from "./scenes/analysisHistory";
 import { useMediaQuery, Box } from "@mui/material";
 
