@@ -1,0 +1,156 @@
+/* Additional global styles for FullCalendar */
+.fc-more-popover {
+  background-color: #1F2A40 !important;
+  border-color: #3e4396 !important;
+}
+
+.fc-popover-header {
+  background-color: #3e4396 !important;
+  color: white !important;
+}
+
+.fc-popover-body {
+  color: white !important;
+}
+
+.fc-daygrid-more-link {
+  background-color: #3e4396 !important;
+  color: white !important;
+}
+
+/* Add back basic event styling */
+.fc .fc-event {
+  background-color: #1976d2 !important;
+  border-color: #1565c0 !important;
+  color: #ffffff !important; /* Set text color to white */
+  padding: 4px 8px !important; /* Increased left and right padding */
+  margin: 2px !important;      /* Optional: Adds slight margin around events */
+}
+
+/* Style for completed (done) events */
+.fc-event-done {
+  background-color: #a5d6a7 !important; /* Light green background */
+  border-color: #66bb6a !important;     /* Darker green border */
+  color: #ffffff !important;            /* White text color */
+  text-decoration: line-through;        /* Strikethrough text */
+}
+
+/* Style for done status dot */
+.status-dot-done {
+  height: 8px;
+  width: 8px;
+  background-color: #4caf50; /* Green */
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px; /* Increased margin for better spacing */
+  /* Align vertically */
+  vertical-align: middle;
+}
+
+/* Style for not done status dot */
+.status-dot-not-done {
+  height: 8px;
+  width: 8px;
+  background-color: #f44336; /* Red */
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px; /* Increased margin for better spacing */
+  /* Align vertically */
+  vertical-align: middle;
+}
+
+/* Make the Calendar Sidebar scrollable */
+.fc-sidebar {
+  max-height: 75vh;       /* Match the FullCalendar height */
+  overflow-y: auto;       /* Enable vertical scrolling */
+}
+
+/* Ensure List in Sidebar uses full width */
+.fc-sidebar .MuiList-root {
+  width: 100%;
+}
+
+.fc .fc-daygrid-event {
+  white-space: nowrap !important;
+  border-radius: 3px !important;
+  margin: 1px 4px !important; /* Increased left and right margin */
+  box-sizing: border-box;      /* Ensure padding and borders are included in the element's total width and height */
+}
+
+.fc .fc-daygrid-day {
+  min-height: 100px !important;
+}
+
+/* Adjust event spacing */
+.fc .fc-daygrid-day-events {
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+}
+
+.fc .fc-daygrid-event {
+  margin-top: 1px !important;
+  margin-bottom: 1px !important;
+}
+
+/* Styles for List Calendar View */
+
+/* Ensure list items have proper padding and border for better visibility */
+.fc-list-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+  background-color: #a5d6a7; /* Light green background to match Event Sidebar */
+  color: #000000; /* Black text color */
+}
+
+/* Remove background color change on hover for even-numbered rows */
+.fc-list-item:nth-child(even):hover {
+  background-color: #f9f9f9; /* Light gray background */
+  color: #000000; /* Black text */
+}
+
+/* Override hover styles to maintain consistent background and text color */
+.fc-list-item:hover {
+  background-color: #e6f7ff !important; /* Light blue on hover */
+  color: #000000 !important; /* Ensure text remains black */
+}
+
+/* Set background and text color for even-numbered rows */
+.fc-list-item:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray background */
+  color: #000000; /* Black text */
+}
+
+/* Set background and text color for odd-numbered rows */
+.fc-list-item:nth-child(odd) {
+  background-color: #a5d6a7; /* Light green background to match Event Sidebar */
+  color: #000000; /* Black text */
+}
+
+/* Optional: Style the day headers in List view */
+.fc-list-day-cushion {
+  background-color: #3e4396 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+/* Ensure the dialog content fits within the fixed size */
+.event-dialog-content {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 16px; /* Adjust padding as needed */
+  
+}
+
+/* Remove extra spacing between status options and buttons */
+.MuiDialogActions-root {
+  padding: 8px 24px; /* Reduced padding */
+}
+
+/* Optional: Add responsive adjustments if necessary */
+@media (max-width: 600px) {
+  .MuiDialog-paper {
+    width: 90% !important; /* Make it responsive on smaller screens */
+    height: auto !important; /* Allow height to adjust */
+  }
+}

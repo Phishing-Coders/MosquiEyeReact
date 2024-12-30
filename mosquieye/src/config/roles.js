@@ -5,7 +5,8 @@ export const ROLES = {
 };
 
 export const ROLE_PERMISSIONS = {
-  'org:admin': ['dashboard', 'team', 'profile', 'maps', 'scan', 'analysis', 'settings'],
+  'org:admin': ['dashboard', 'team', 'profile', 'maps', 'scan', 'analysis', 'settings', 'contacts', 'qrscan', 
+    'calendar', 'geography', 'faq', 'bar', 'form', 'line', 'pie', 'invoices', 'analysisHistory'],
   'org:health_office': ['dashboard', 'maps', 'scan', 'analysis', 'profile'],
   'org:operations_team': ['scan', 'analysis', 'profile']
 };
