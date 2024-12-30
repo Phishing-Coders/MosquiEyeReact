@@ -12,8 +12,11 @@ export default defineConfig({
     port: 3000, // Replace with your desired port
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // Server on 5000
-        changeOrigin: true
+        target: process.env.NODE_ENV === 'production' 
+          ? 'https://mosquieye-server.vercel.app/'
+          : 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
       }
     },
     fs: {
