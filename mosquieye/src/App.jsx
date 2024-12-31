@@ -7,7 +7,7 @@ import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/team";
-import Invoices from "./scenes/invoices";
+import Ovitrap from "./scenes/ovitrap";
 import Contacts from "./scenes/contacts";
 import Bar from "./scenes/bar";
 import Form from "./scenes/form";
@@ -47,7 +47,7 @@ function App() {
     { path: "/dashboard", element: <Dashboard />, permission: "dashboard" },
     { path: "/team", element: <Team />, permission: "team" },
     { path: "/contacts", element: <Contacts />, permission: "contacts" },
-    { path: "/invoices", element: <Invoices />, permission: "invoices" },
+    { path: "/ovitrap", element: <Ovitrap />, permission: "ovitrap" },
     { path: "/form", element: <Form />, permission: "form" },
     { path: "/bar", element: <Bar/>, permission: "bar" },
     { path: "/pie", element: <Pie/>, permission: "pie" },
@@ -60,9 +60,7 @@ function App() {
     { path: "/scan", element: <Scan />, permission: "scan" },
     { path: "/analysis", element: <Analysis />, permission: "analysis" },
     { path: "/analysisHistory", element: <AnalysisHistory />, permission: "analysisHistory" },
-    
     { path: "/qrscan", element: <QRScan />, permission: "qrscan" },
-
   ];
 
   return (
