@@ -9,10 +9,8 @@ import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import AddLocationOutlinedIcon from '@mui/icons-material/AddLocationOutlined';
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
@@ -70,9 +68,9 @@ const menuConfig = [
         permissions: ["org:health_office", "org:operations_team"]
       },
       {
-        title: "Recent Total Eggs",
-        to: "/invoices",
-        icon: <ReceiptOutlinedIcon />,
+        title: "Ovitrap Management",
+        to: "/ovitrap",
+        icon: <AddLocationOutlinedIcon />,
         permissions: ["org:health_office"]
       }
     ]
@@ -161,8 +159,8 @@ const Sidebar = () => {
       setSelected("Manage Team");
     } else if (path === "/contacts") {
       setSelected("Contacts Information");
-    } else if (path === "/invoices") {
-      setSelected("Invoices Balances");
+    } else if (path === "/ovitrap") {
+      setSelected("Ovitrap Management");
     } else if (path === "/form") {
       setSelected("Profile Form");
     } else if (path === "/calendar") {
@@ -388,13 +386,6 @@ const Sidebar = () => {
               title="QR Scan" // Add the QR Scan item here
               to="/qrscan" // Ensure this matches your routing
               icon={<QrCodeIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Profile Form"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
