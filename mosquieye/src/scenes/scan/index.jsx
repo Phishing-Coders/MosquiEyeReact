@@ -47,17 +47,9 @@ const Scan = () => {
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result);
-        // Reset other states related to cropping when a new image is uploaded
+        console.log("Image uploaded:", reader.result); // Debug log
         setCroppedImage(null);
         setCroppedAreaPixels(null);
-        
-        // Add scroll behavior
-        setTimeout(() => {
-          bottomSectionRef.current?.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }, 100);
       };
       reader.readAsDataURL(file);
     }
@@ -171,7 +163,7 @@ const Scan = () => {
               <Typography
                 variant={isMobile ? "h5" : "h4"}
                 align="center"
-                sx={{ mb: 3 }}
+                sx={{ mb: 3, fontWeight: 'bold', fontSize: '1.4rem' }} 
               >
                 Select the ovitrap image type
               </Typography>
@@ -182,7 +174,7 @@ const Scan = () => {
                 <Card
                   onClick={() => handleToggle('paper')}
                   sx={{
-                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
+                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.common.white}` : 'none',
                     boxShadow: imageType === 'paper' ? 3 : 1,
                     height: '100%',
                     transition: '0.3s'
@@ -206,10 +198,10 @@ const Scan = () => {
 
                 <Grid item xs={1} md={3} style={{ display: 'flex' }}>
                 <Card
-                  onClick={() => handleToggle('paper')}
+                  onClick={() => handleToggle('magnified')}
                   sx={{
-                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
-                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    border: theme => imageType === 'magnified' ? `2px solid ${theme.palette.common.white}` : 'none',
+                    boxShadow: imageType === 'magnified' ? 3 : 1,
                     height: '100%',
                     transition: '0.3s'
                   }}
@@ -232,10 +224,10 @@ const Scan = () => {
 
                 <Grid item xs={1} md={3} style={{ display: 'flex' }}>
                 <Card
-                  onClick={() => handleToggle('paper')}
+                  onClick={() => handleToggle('micro')}
                   sx={{
-                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
-                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    border: theme => imageType === 'micro' ? `2px solid ${theme.palette.common.white}` : 'none',
+                    boxShadow: imageType === 'micro' ? 3 : 1,
                     height: '100%',
                     transition: '0.3s'
                   }}
@@ -324,119 +316,31 @@ const Scan = () => {
       </Box>      
 
       <Box m="20px" ref={bottomSectionRef}>  
-        <Formik
-          onSubmit={handleFormSubmit}
-          initialValues={initialValues}
-          validationSchema={checkoutSchema}
-        >
-          {({
-            values,
-            errors,
-            touched,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-          }) => (
-            <form onSubmit={handleSubmit}>
-              {/* <Box
-                display="grid"
-                gap="30px"
-                gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                sx={{
-                  "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                }}
-              >
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="First Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.firstName}
-                  name="firstName"
-                  error={!!touched.firstName && !!errors.firstName}
-                  helperText={touched.firstName && errors.firstName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Last Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.lastName}
-                  name="lastName"
-                  error={!!touched.lastName && !!errors.lastName}
-                  helperText={touched.lastName && errors.lastName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Email"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.email}
-                  name="email"
-                  error={!!touched.email && !!errors.email}
-                  helperText={touched.email && errors.email}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Contact Number"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.contact}
-                  name="contact"
-                  error={!!touched.contact && !!errors.contact}
-                  helperText={touched.contact && errors.contact}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Address 1"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.address1}
-                  name="address1"
-                  error={!!touched.address1 && !!errors.address1}
-                  helperText={touched.address1 && errors.address1}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Address 2"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.address2}
-                  name="address2"
-                  error={!!touched.address2 && !!errors.address2}
-                  helperText={touched.address2 && errors.address2}
-                  sx={{ gridColumn: "span 4" }}
-                />
-              </Box> */}
-              <Box display="flex" justifyContent="center" mt="-10px">
-                <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
-                  Submit
-                </Button>
-                {/* <Box width="20px" />
-                <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
-                  to analysis
-                </Button> */}
-              </Box>
-            </form>
-          )}
-        </Formik>
+        {imageSrc && (
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            mt={2}
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              marginBottom: '100px'  // Changed from 4 to 100px for more space
+            }}
+          >
+            <Button 
+              color="secondary" 
+              variant="contained" 
+              onClick={() => handleToAnalysis({})}
+              size="large"
+              sx={{
+                padding: '10px 30px',
+                fontSize: '1.1rem'
+              }}
+            >
+              Analyze Image
+            </Button>
+          </Box>
+        )}
       </Box>
     </Box>
   );

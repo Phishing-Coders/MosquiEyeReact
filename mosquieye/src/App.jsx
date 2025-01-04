@@ -1,5 +1,5 @@
 import '@ionic/react/css/core.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -42,6 +42,25 @@ function App() {
   const isMobile = useMediaQuery("(max-width:600px)");
 
   const userRole = user?.organizationMemberships?.[0]?.role;
+
+  useEffect(() => {
+    if (user && user.id) {
+      fetch("/api/users/saveUser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clerkUserId: user.id,
+          email: user.primaryEmailAddress?.emailAddress,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: "org:operations_team"
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => console.log("User synced:", data))
+        .catch((err) => console.error("Sync error:", err));
+    }
+  }, [user]);
 
   const routes = [
     { path: "/dashboard", element: <Dashboard />, permission: "dashboard" },
