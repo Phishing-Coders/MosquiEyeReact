@@ -57,88 +57,31 @@ const QRScan = () => {
         title="QR Scanner" 
         subtitle="Scan QR codes to retrieve ovitrap information" 
       />
-      
-      <Container maxWidth="md">
-        <Grid container spacing={3}>
-          <Grid item xs={8}>
-            <Card>
-              <CardContent>
-                <Box 
-                  id="reader" 
-                  sx={{ 
-                    width: '100%', 
-                    height: isScanning ? '400px' : '200px', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    border: `2px dashed ${theme.palette.grey[400]}`,
-                    transition: 'height 0.3s ease',
-                    borderRadius: '8px',
-                    backgroundColor: isScanning 
-                      ? theme.palette.grey[200] 
-                      : theme.palette.background.paper
-                  }}
-                >
-                  {!isScanning ? (
-                    <Box textAlign="center">
-                      <QrCodeScannerIcon 
-                        sx={{ 
-                          fontSize: 80, 
-                          color: theme.palette.grey[600] 
-                        }} 
-                      />
-                      <Typography variant="h6" color="textSecondary">
-                        Ready to Scan QR Code
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Typography variant="h6" color="textSecondary">
-                      Scanning...
-                    </Typography>
-                  )}
-                </Box>
-                
-                <Box mt={2} textAlign="center">
-                  <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={startScanning}
-                    disabled={isScanning || !isSignedIn}
-                    sx={{ 
-                      padding: '10px 20px', 
-                      fontSize: '16px' 
-                    }}
-                  >
-                    Start Scanning
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
 
-      {/* Scan Result Dialog */}
-      <Dialog 
-        open={openDialog} 
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
+      <Box 
+        sx={{ 
+          width: '100%', 
+          maxWidth: '500px',
+          margin: '20px auto' 
+        }}
       >
-        <DialogTitle>QR Code Scanned</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Scanned Result: {scanResult || 'No result'}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-          <Button 
-            onClick={handleScanAgain} 
-            color="primary" 
-            variant="contained"
-          >
-            Scan Again
+        {Capacitor.getPlatform() === 'web' ? (
+          <BarcodeScannerComponent
+            width={500}
+            height={500}
+            onUpdate={(err, result) => {
+              if (result) {
+                setScanResult(result.text);
+                setError('');
+              } else {
+                setScanResult('');
+                setError('Not Found');
+              }
+            }}
+          />
+        ) : (
+          <Button variant="contained" color="primary" onClick={handleScan}>
+            Scan QR Code
           </Button>
         )}
 
