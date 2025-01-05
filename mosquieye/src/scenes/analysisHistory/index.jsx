@@ -68,7 +68,7 @@ const AnalysisHistory = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image={`http://localhost:5000/api/images/${analysis.imageId}`}
+                image={`api/images/${analysis.imageId}`}
                 alt="Analysis result"
                 sx={{ objectFit: 'contain' }}
               />

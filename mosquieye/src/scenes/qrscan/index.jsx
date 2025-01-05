@@ -1,219 +1,107 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Container, 
-  Grid, 
-  Card, 
-  CardContent, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Snackbar, 
-  Alert, 
-  useTheme 
-} from '@mui/material';
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import React, { useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Box, Typography, Alert, Snackbar, Button } from '@mui/material';
 import Header from "../../components/Header";
-import { Html5Qrcode } from 'html5-qrcode';
-import { useUser } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
 const QRScan = () => {
-  // Use useNavigate instead of Navigate component
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const { isSignedIn, isLoaded, user } = useUser();
-  
-  // State management with more robust initial states
-  const [scanResult, setScanResult] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [qrCodeErrorMessage, setQrCodeErrorMessage] = useState('');
+  const [scanResult, setScanResult] = useState('');
+  const [error, setError] = useState('');
 
-  // Redirect logic moved to useEffect
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      navigate('/');
+  const handleScan = async () => {
+    try {
+      const photo = await Camera.getPhoto({
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        quality: 100,
+      });
+
+      const result = await decodeQRCode(photo.dataUrl);
+      setScanResult(result);
+    } catch (error) {
+      setError('Failed to scan QR code: ' + error.message);
     }
-  }, [isLoaded, isSignedIn, navigate]);
+  };
 
-  // Memoized scanning function
-  const startScanning = useCallback(() => {
-    // Ensure scanning only starts if user is signed in
-    if (!isSignedIn) return;
+  const decodeQRCode = async (dataUrl) => {
+    const img = new Image();
+    img.src = dataUrl;
 
-    const html5QrCode = new Html5Qrcode("reader");
-    const qrCodeSuccessCallback = (decodedText) => {
-      setIsScanning(false);
-      setScanResult(decodedText);
-      setOpenDialog(true);
-      html5QrCode.stop();
-    };
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        context.drawImage(img, 0, 0, img.width, img.height);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-    const config = { 
-      fps: 10, 
-      qrbox: { width: 250, height: 250 } 
-    };
+        if (code) {
+          resolve(code.data);
+        } else {
+          reject(new Error('QR code not found'));
+        }
+      };
 
-    html5QrCode.start(
-      { facingMode: "environment" }, 
-      config, 
-      qrCodeSuccessCallback,
-      (errorMessage) => {
-        console.error("QR Scan Error:", errorMessage);
-        setQrCodeErrorMessage(errorMessage || "Scanning failed");
-      }
-    ).catch(err => {
-      console.error("Error starting QR code scanner:", err);
-      setQrCodeErrorMessage("Failed to start scanning. Check camera permissions.");
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
     });
+  };
 
-    setIsScanning(true);
-  }, [isSignedIn]);
-
-  // Dialog and scanning management functions
-  const handleCloseDialog = useCallback(() => {
-    setOpenDialog(false);
-    setScanResult(null);
-  }, []);
-
-  const handleScanAgain = useCallback(() => {
-    handleCloseDialog();
-    startScanning();
-  }, [handleCloseDialog, startScanning]);
-
-  // Cleanup scanner on component unmount
-  useEffect(() => {
-    return () => {
-      try {
-        const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.stop();
-      } catch (error) {
-        console.warn("Error stopping QR scanner:", error);
-      }
-    };
-  }, []);
-
-  // Render loading state while authentication is checking
-  if (!isLoaded) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <Typography variant="h6">Loading...</Typography>
-      </Box>
-    );
-  }
-
-  // Main render
   return (
     <Box m="20px">
       <Header 
-        title="QR Code Scanner" 
-        subtitle="Scan QR codes from ovitraps to retrieve location and metadata" 
+        title="QR Scanner" 
+        subtitle="Scan QR codes to retrieve ovitrap information" 
       />
-      
-      <Container maxWidth="md">
-        <Grid container spacing={3}>
-          <Grid item xs={8}>
-            <Card>
-              <CardContent>
-                <Box 
-                  id="reader" 
-                  sx={{ 
-                    width: '100%', 
-                    height: isScanning ? '400px' : '200px', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    border: `2px dashed ${theme.palette.grey[400]}`,
-                    transition: 'height 0.3s ease',
-                    borderRadius: '8px',
-                    backgroundColor: isScanning 
-                      ? theme.palette.grey[200] 
-                      : theme.palette.background.paper
-                  }}
-                >
-                  {!isScanning ? (
-                    <Box textAlign="center">
-                      <QrCodeScannerIcon 
-                        sx={{ 
-                          fontSize: 80, 
-                          color: theme.palette.grey[600] 
-                        }} 
-                      />
-                      <Typography variant="h6" color="textSecondary">
-                        Ready to Scan QR Code
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Typography variant="h6" color="textSecondary">
-                      Scanning...
-                    </Typography>
-                  )}
-                </Box>
-                
-                <Box mt={2} textAlign="center">
-                  <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={startScanning}
-                    disabled={isScanning || !isSignedIn}
-                    sx={{ 
-                      padding: '10px 20px', 
-                      fontSize: '16px' 
-                    }}
-                  >
-                    Start Scanning
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
 
-      {/* Scan Result Dialog */}
-      <Dialog 
-        open={openDialog} 
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
+      <Box 
+        sx={{ 
+          width: '100%', 
+          maxWidth: '500px',
+          margin: '20px auto' 
+        }}
       >
-        <DialogTitle>QR Code Scanned</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Scanned Result: {scanResult || 'No result'}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-          <Button 
-            onClick={handleScanAgain} 
-            color="primary" 
-            variant="contained"
-          >
-            Scan Again
+        {Capacitor.getPlatform() === 'web' ? (
+          <BarcodeScannerComponent
+            width={500}
+            height={500}
+            onUpdate={(err, result) => {
+              if (result) {
+                setScanResult(result.text);
+                setError('');
+              } else {
+                setScanResult('');
+                setError('Not Found');
+              }
+            }}
+          />
+        ) : (
+          <Button variant="contained" color="primary" onClick={handleScan}>
+            Scan QR Code
           </Button>
-        </DialogActions>
-      </Dialog>
+        )}
 
-      {/* Error Snackbar */}
-      <Snackbar
-        open={!!qrCodeErrorMessage}
-        autoHideDuration={6000}
-        onClose={() => setQrCodeErrorMessage('')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setQrCodeErrorMessage('')} 
-          severity="error" 
-          sx={{ width: '100%' }}
+        {scanResult && (
+          <Box mt={2} textAlign="center">
+            <Typography variant="h6">Scanned Result:</Typography>
+            <Typography>{scanResult}</Typography>
+          </Box>
+        )}
+
+        <Snackbar 
+          open={!!error} 
+          autoHideDuration={6000} 
+          onClose={() => setError('')}
         >
-          {qrCodeErrorMessage}
-        </Alert>
-      </Snackbar>
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        </Snackbar>
+      </Box>
     </Box>
   );
 };
