@@ -3,6 +3,12 @@ import User from '../models/Users.js';
 
 const router = express.Router();
 
+const ROLE_PERMISSIONS = {
+  "org:admin": ["dashboard", "team", "profile", "maps", "scan", "analysis", "settings"],
+  "org:health_office": ["dashboard", "profile", "analysis"],
+  "org:operations_team": ["dashboard", "scan"]
+};
+
 // Get all users
 router.get('/all', async (req, res) => {
   try {
@@ -65,6 +71,20 @@ router.get('/:clerkUserId', async (req, res) => {
     }
 
     res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Error fetching user', error: error.message });
+  }
+});
+
+// Get user by Clerk ID
+router.get('/clerk/:clerkUserId', async (req, res) => {
+  try {
+    const user = await User.findOne({ clerkUserId: req.params.clerkUserId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ user });
   } catch (error) {
     console.error('Error fetching user:', error);
     res.status(500).json({ message: 'Error fetching user', error: error.message });
