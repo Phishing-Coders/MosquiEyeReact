@@ -65,7 +65,7 @@ const Profile = () => {
     try {
       setLoading(true);
       const response = await axios.put(
-        `http://localhost:5000/api/users/${user.id}`,
+        `/api/users/${user.id}`,
         {
           firstName: values.firstName,
           lastName: values.lastName,

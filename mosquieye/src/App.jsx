@@ -24,6 +24,7 @@ import MapPage from "./scenes/maps";
 import Scan from "./scenes/scan";
 import Analysis from "./scenes/analysis";
 import QRScan from "./scenes/qrscan";
+import AnalysisHistory from "./scenes/analysisHistory";
 import { useMediaQuery, Box } from "@mui/material";
 
 import MobileNavigation from "./components/MobileNavigation";
@@ -58,6 +59,7 @@ function App() {
     { path: "/maps", element: <MapPage />, permission: "maps" },
     { path: "/scan", element: <Scan />, permission: "scan" },
     { path: "/analysis", element: <Analysis />, permission: "analysis" },
+    { path: "/analysisHistory", element: <AnalysisHistory />, permission: "analysisHistory" },
     
     { path: "/qrscan", element: <QRScan />, permission: "qrscan" },
 

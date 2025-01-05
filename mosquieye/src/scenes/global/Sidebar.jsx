@@ -1,3 +1,4 @@
+import React from "react"; // Import React
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,8 +8,6 @@ import { useState, useEffect } from "react"; // Import useState and useEffect
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ScannerIcon from '@mui/icons-material/Scanner';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -42,6 +41,107 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
+
+const menuConfig = [
+  {
+    category: 'Main',
+    items: [
+      {
+        title: "Dashboard",
+        to: "/dashboard",
+        icon: <HomeOutlinedIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      }
+    ]
+  },
+  {
+    category: 'Data',
+    items: [
+      {
+        title: "Manage Team",
+        to: "/team",
+        icon: <PeopleOutlinedIcon />,
+        permissions: ["org:health_office"]
+      },
+      {
+        title: "Contacts Information",
+        to: "/contacts",
+        icon: <ContactsOutlinedIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      },
+      {
+        title: "Recent Total Eggs",
+        to: "/invoices",
+        icon: <ReceiptOutlinedIcon />,
+        permissions: ["org:health_office"]
+      }
+    ]
+  },
+  {
+    category: 'Pages',
+    items: [
+      {
+        title: "Scan",
+        to: "/scan",
+        icon: <CompareIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      },
+      {
+        title: "QR Scan",
+        to: "/qrscan",
+        icon: <QrCodeIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      },
+      {
+        title: "Calendar",
+        to: "/calendar",
+        icon: <CalendarTodayOutlinedIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      },
+      {
+        title: "Map",
+        to: "/maps",
+        icon: <MapOutlinedIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      },
+      {
+        title: "Analysis History",
+        to: "/analysisHistory",
+        icon: <TimelineOutlinedIcon />,
+        permissions: ["org:health_office", "org:operations_team"]
+      }
+    ]
+  },
+  {
+    category: 'Charts',
+    items: [
+      {
+        title: "Bar Chart",
+        to: "/bar",
+        icon: <BarChartOutlinedIcon />,
+        permissions: ["org:health_office"]
+      },
+      {
+        title: "Pie Chart",
+        to: "/pie",
+        icon: <PieChartOutlineOutlinedIcon />,
+        permissions: ["org:health_office"]
+      },
+      {
+        title: "Line Chart",
+        to: "/line",
+        icon: <TimelineOutlinedIcon />,
+        permissions: ["org:health_office"]
+      },
+      {
+        title: "Geography Chart",
+        to: "/geography",
+        icon: <MapOutlinedIcon />,
+        permissions: ["org:health_office"]
+      }
+    ]
+  }
+];
 const Sidebar = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
   const theme = useTheme();
@@ -98,9 +198,32 @@ const Sidebar = () => {
     return null; // Don't render the sidebar if on the login page
   }
 
-  console.log("Current user role:", userRole);
-  console.log("User object:", user);
-  console.log("Organization memberships:", user?.organizationMemberships);
+  // console.log("Current user role:", userRole);
+  // console.log("User object:", user);
+  // console.log("Organization memberships:", user?.organizationMemberships);
+
+  const hasPermission = (permissions) => {
+    if (userRole === "org:admin") {
+      return true;
+    }
+
+    return permissions.includes(userRole);
+  };
+
+  const renderMenuItems = (items) => {
+    return items
+      .filter(item => hasPermission(item.permissions))
+      .map(item => (
+        <Item
+          key={item.title}
+          title={item.title}
+          to={item.to}
+          icon={item.icon}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      ));
+  };
 
   return (
     <Box
@@ -186,7 +309,30 @@ const Sidebar = () => {
             </Box>
           )}
 
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          
+            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+              {menuConfig.map(({ category, items }) => {
+                const filteredItems = items.filter(item => 
+                  hasPermission(item.permissions)
+                );
+                
+                if (filteredItems.length === 0) return null;
+
+                return (
+                  <React.Fragment key={category}>
+                    <Typography
+                      variant="h6"
+                      color={colors.grey[300]}
+                      sx={{ m: "15px 0 5px 20px" }}
+                    >
+                      {category}
+                    </Typography>
+                    {renderMenuItems(filteredItems)}
+                  </React.Fragment>
+                );
+              })}
+          </Box>
+          {/* <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
               to="/dashboard"
@@ -302,7 +448,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-          </Box>
+          </Box> */}
         </Menu>
       </ProSidebar>
     </Box>

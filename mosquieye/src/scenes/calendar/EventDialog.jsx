@@ -1,23 +1,70 @@
 import {
-  Dialog, DialogTitle, DialogContent, FormControl, FormLabel, RadioGroup,
+  Dialog as MuiDialog, DialogTitle, DialogContent, FormControl, FormLabel, RadioGroup,
   FormControlLabel, Radio, TextField, Grid, Select, MenuItem, InputLabel,
-  DialogActions, Button, Snackbar, Alert, Checkbox, Box
+  DialogActions, Button, Snackbar, Alert, Checkbox, Box, Typography
 } from "@mui/material";
+import { useState } from "react";
+
+export const renderEventContent = (eventInfo) => {
+  if (eventInfo.event.extendedProps.isFullDay) {
+    return (
+      <div className="fc-content">
+        <div className="fc-title">{eventInfo.event.title}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="fc-content">
+      <span className="fc-event-time">{eventInfo.timeText}</span>
+      <span className="fc-event-title">{eventInfo.event.title}</span>
+    </div>
+  );
+};
 
 const EventDialog = ({
   openDialog, handleCloseDialog, selectedEvent, isRange, setIsRange,
   formData, handleInputChange, handleFormSubmit, snackbar, handleSnackbarClose,
-  closeMorePopover, isFullDay, setIsFullDay
+  closeMorePopover, isFullDay, setIsFullDay, handleDelete
 }) => {
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    message: '',
+    action: null
+  });
+
+  const handleConfirmAction = (action, title, message) => {
+    setConfirmDialog({
+      open: true,
+      title,
+      message,
+      action
+    });
+  };
+
+  const handleConfirm = () => {
+    if (confirmDialog.action) {
+      confirmDialog.action();
+    }
+    setConfirmDialog({ ...confirmDialog, open: false });
+  };
+
   return (
     <>
-      <Dialog
+      <MuiDialog
         open={openDialog}
         onClose={handleCloseDialog}
         onClick={() => closeMorePopover()}
+        PaperProps={{
+          style: {
+            width: '600px',    // Increased width
+            height: '500px',   // Decreased height
+            overflow: 'hidden' // Ensure no scrolling
+          },
+        }}
       >
         <DialogTitle>{selectedEvent ? "Edit Event" : "Create Event"}</DialogTitle>
-        <DialogContent>
+        <DialogContent className="event-dialog-content" sx={{ padding: '16px', overflow: 'hidden' }}>
           <FormControl component="fieldset">
             <FormLabel component="legend">Event Type</FormLabel>
             <Box display="flex" alignItems="center">
@@ -167,27 +214,80 @@ const EventDialog = ({
               <MenuItem value="Ovitrap 3">Ovitrap 3</MenuItem>
             </Select>
           </FormControl>
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="status-label">Status</InputLabel>
-            <Select
-              labelId="status-label"
+          <FormControl component="fieldset" sx={{ marginTop: '16px' }}>
+            <FormLabel component="legend">Status</FormLabel>
+            <RadioGroup
+              row
+              aria-label="status"
               name="status"
               value={formData.status}
               onChange={handleInputChange}
-              label="Status"
+              sx={{ gap: '16px' }} // Reduce spacing between radio buttons
             >
-              <MenuItem value="not done">Not Done</MenuItem>
-              <MenuItem value="done">Done</MenuItem>
-            </Select>
+              <FormControlLabel value="not done" control={<Radio />} label="Not Done" />
+              <FormControlLabel value="done" control={<Radio />} label="Done" />
+            </RadioGroup>
           </FormControl>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleFormSubmit}>
+        <DialogActions sx={{ padding: '16px', justifyContent: 'flex-end', gap: '8px' }}> {/* Adjust spacing */}
+          <Button 
+            onClick={handleCloseDialog}
+            sx={{ color: 'black', backgroundColor: 'white' }}
+          >
+            Cancel
+          </Button>
+          {selectedEvent && (
+            <Button 
+              onClick={() => handleConfirmAction(
+                handleDelete,
+                "Delete Event",
+                "Are you sure you want to delete this event?"
+              )}
+              color="error"
+              sx={{ mr: 'auto' }}
+            >
+              Delete
+            </Button>
+          )}
+          <Button 
+            onClick={() => handleConfirmAction(
+              handleFormSubmit,
+              selectedEvent ? "Update Event" : "Create Event",
+              selectedEvent 
+                ? "Are you sure you want to update this event?"
+                : "Are you sure you want to create this event?"
+            )}
+            sx={{ color: 'black', backgroundColor: 'white' }}
+          >
             {selectedEvent ? "Update" : "Create"}
           </Button>
         </DialogActions>
-      </Dialog>
+      </MuiDialog>
+
+      <MuiDialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+      >
+        <DialogTitle>{confirmDialog.title}</DialogTitle>
+        <DialogContent>
+          <Typography>{confirmDialog.message}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            sx={{ color: 'black', backgroundColor: 'white' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirm}
+            color={confirmDialog.title.includes('Delete') ? 'error' : 'primary'}
+            sx={confirmDialog.title.includes('Delete') ? {} : { color: 'black', backgroundColor: 'white' }}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </MuiDialog>
 
       <Snackbar
         open={snackbar.open}

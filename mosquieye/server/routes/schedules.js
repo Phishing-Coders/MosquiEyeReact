@@ -111,20 +111,34 @@ router.get('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { ovitrap_id, schedule_by, type, startDate, endDate, startTime, endTime, task, status, isFullDay } = req.body;
+    
+    // First, get the existing schedule
+    const existingSchedule = await Schedule.findById(req.params.id);
+    if (!existingSchedule) {
+      return res.status(404).json({ message: 'Schedule not found' });
+    }
+
+    // Only update the date if it has actually changed
     const updateData = {
-      ovitrap_id,
-      schedule_by,
-      type,
-      startDate: new Date(startDate),
-      task,
-      status,
-      startTime,
-      endTime,    // Always include endTime
-      isFullDay: isFullDay || false  // Add this line
+      ovitrap_id: ovitrap_id || existingSchedule.ovitrap_id,
+      schedule_by: schedule_by || existingSchedule.schedule_by,
+      type: type || existingSchedule.type,
+      task: task || existingSchedule.task,
+      status: status || existingSchedule.status,
+      startTime: startTime || existingSchedule.startTime,
+      endTime: endTime || existingSchedule.endTime,
+      isFullDay: isFullDay !== undefined ? isFullDay : existingSchedule.isFullDay
     };
 
+    // Only update dates if they've changed
+    if (startDate && startDate !== existingSchedule.startDate.toISOString().split('T')[0]) {
+      updateData.startDate = new Date(startDate);
+    }
+
     if (type === 'range') {
-      updateData.endDate = new Date(endDate);
+      if (endDate && endDate !== (existingSchedule.endDate ? existingSchedule.endDate.toISOString().split('T')[0] : null)) {
+        updateData.endDate = new Date(endDate);
+      }
     } else {
       updateData.endDate = null;
     }
@@ -135,9 +149,6 @@ router.put('/:id', async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    if (!updatedSchedule) {
-      return res.status(404).json({ message: 'Schedule not found' });
-    }
     res.json({
       message: 'Schedule updated successfully',
       schedule: updatedSchedule

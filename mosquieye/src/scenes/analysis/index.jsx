@@ -471,7 +471,7 @@ const handleSubmit = async () => {
     };
 
     // Send to server in chunks if needed
-    const response = await axios.post('http://localhost:5000/api/images', {
+    const response = await axios.post('/api/images', {
       imageData,
       analysisData: JSON.stringify(analysisData)
     }, {

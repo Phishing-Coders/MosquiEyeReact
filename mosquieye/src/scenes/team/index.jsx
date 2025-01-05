@@ -16,7 +16,7 @@ const Team = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/all');
+        const response = await axios.get('/api/users/all');
         const usersWithId = response.data.map((user, index) => ({
           rowNumber: index + 1,
           id: user._id, // Use the MongoDB ObjectId as the id
