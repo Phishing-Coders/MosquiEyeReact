@@ -17,6 +17,7 @@ import CalendarSidebar from "./CalendarSidebar";
 import EventDialog from "./EventDialog";
 import { Margin } from "@mui/icons-material";
 import './CalendarStyles.css';
+import { useUser } from '@clerk/clerk-react'; // Add this import
 
 // Add axios instance with base URL
 const api = axios.create({
@@ -73,6 +74,7 @@ const Calendar = () => {
     severity: 'success'
   });
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // Add this state
+  const { user } = useUser(); // Add this line to get the user object
 
   // Add this useEffect to fetch schedules when component mounts
   useEffect(() => {
@@ -289,7 +291,7 @@ const Calendar = () => {
 
       const submitData = {
         ovitrap_id: formData.ovitrap,
-        schedule_by: "65a0c5d8d9e6c48c0d972b14",
+        schedule_by: user.id, // Use the user unique ID from Clerk
         type: isRange ? 'range' : 'single',
         startDate: formData.startDate,
         endDate: isRange ? formData.endDate : null,

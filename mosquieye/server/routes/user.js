@@ -3,6 +3,12 @@ import User from '../models/Users.js';
 
 const router = express.Router();
 
+const ROLE_PERMISSIONS = {
+  "org:admin": ["dashboard", "team", "profile", "maps", "scan", "analysis", "settings"],
+  "org:health_office": ["dashboard", "profile", "analysis"],
+  "org:operations_team": ["dashboard", "scan"]
+};
+
 // Get all users
 router.get('/all', async (req, res) => {
   try {

@@ -94,9 +94,6 @@ const Invoices = () => {
       <Header title="INVOICES" subtitle="List of Invoice Balances" />
       <Typography variant="h6">User ID: {userId}</Typography>
       <Typography variant="h6">User Email: {userEmail}</Typography>
-
-      
-
       {isLoading ? (
         <Typography>Loading users...</Typography>
       ) : error ? (

@@ -11,6 +11,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import HistoryIcon from '@mui/icons-material/History';
+import { useUser } from '@clerk/clerk-react';
 
 // Import styled from '@mui/material/styles'
 import { styled } from '@mui/material/styles';
@@ -80,6 +81,7 @@ const { imageData, imageType: locationImageType, additionalData } = location.sta
 const navigate = useNavigate();
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [submitError, setSubmitError] = useState(null);
+const { user } = useUser();
 
 // Create a ref for the canvas container
 const canvasContainerRef = useRef(null);
@@ -457,6 +459,15 @@ const handleSubmit = async () => {
     const imageData = canvas.toDataURL('image/jpeg', 0.6); // Reduce quality to 60%
 
     // Prepare analysis data
+    let ovitrapType = '';
+    if (locationImageType === 'paper') {
+      ovitrapType = 'paper strip';
+    } else if (locationImageType === 'magnified') {
+      ovitrapType = 'magnified';
+    } else if (locationImageType === 'micro') {
+      ovitrapType = 'microscope';
+    }
+
     const analysisData = {
       singleEggs: singlesCount,
       clusteredEggs: parseInt(singlesCalculated),
@@ -467,7 +478,9 @@ const handleSubmit = async () => {
       clustersTotalArea: clustersTotalArea,
       avgClusterArea: parseFloat(avgClusterArea),
       avgEggsPerCluster: parseFloat(avgEggsPerCluster),
-      imageSize: imageSize
+      imageSize: imageSize,
+      scan_by: user?.id,
+      ovitrap_type: ovitrapType
     };
 
     // Send to server in chunks if needed
@@ -512,6 +525,8 @@ const navigateToHistory = () => {
 
   return (
     <Container fluid="true">
+      {/* <h1>Analysis Dashboard</h1>
+      <h2>Detailed Analysis of Scanned Images</h2> */}
       <Grid container spacing={3}>
         <Grid item xs={12} md={8} lg={8} xl={9} style={{ display: analysisStarted ? 'block' : 'none' }}>
           <Card className="elevation-5">
@@ -585,7 +600,7 @@ const navigateToHistory = () => {
         </Grid>
         <Grid item xs={12} md={4} lg={3} xl={3} style={{ paddingLeft: analysisComplete ? '0' : '3' }}>
           {drawer && (
-            <Card className="mb-2" style={{ width: '120%', marginRight: '10%', marginLeft: '5%' }}> {/* Modified this line */}
+            <Card className="mb-2" style={{ width: '100%', marginRight: '10%', marginLeft: '5%' }}> {/* Modified this line */}
               <CardContent>
                 <h4>Filters</h4>
                 <Grid container>
@@ -685,7 +700,7 @@ const navigateToHistory = () => {
               </CardContent>
             </Card>
           )}
-          <Card style={{ width: '120%', marginRight: '10%', marginLeft: '5%' }}> {/* Added same styling as filter card */}
+          <Card style={{ width: '100%', marginRight: '10%', marginLeft: '5%' }}> {/* Added same styling as filter card */}
             <CardContent>
               <Grid container justifyContent="space-between" alignItems="center">
                 <Grid item>
@@ -759,7 +774,7 @@ const navigateToHistory = () => {
           </CardActions>
         </Card>
       </Dialog>
-      <div style={{    bottom: 0, width: '80%', display: showBottom ? 'flex' : 'none', justifyContent: 'space-around', height: '50px' }}>
+      <div style={{    bottom: 0, width: '80%', marginBottom:'7%', display: showBottom ? 'flex' : 'none', justifyContent: 'space-around', height: '50px' }}>
         <Button color="primary" onClick={rerender} style={{ color: 'white' }}>
           <span>Reset</span>
           <RestartAltIcon/>
@@ -777,14 +792,14 @@ const navigateToHistory = () => {
           <span>{isSubmitting ? 'Submitting...' : 'Submit'}</span>
           <PublishIcon />
         </Button>
-        <Button 
+        {/* <Button 
           color="primary" 
           onClick={navigateToHistory} 
           style={{ color: 'white' }}
         >
           <span>History</span>
           <HistoryIcon />
-        </Button>
+        </Button> */}
       </div>
     </Container>
   );
