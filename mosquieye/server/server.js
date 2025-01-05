@@ -148,8 +148,6 @@ app.use('/api/schedules', schedulesRouter); // Ensure this line exists
 // Update MongoDB connection with retry logic
 const connectWithRetry = () => {
   mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
     retryWrites: true,

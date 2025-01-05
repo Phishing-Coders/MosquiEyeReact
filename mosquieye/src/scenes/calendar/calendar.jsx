@@ -288,10 +288,14 @@ const Calendar = () => {
         });
         return;
       }
-
+  
+      // First fetch the MongoDB user ID
+      const userResponse = await api.get(`/api/users/clerk/${user.id}`);
+      const mongoUserId = userResponse.data.user._id;
+  
       const submitData = {
         ovitrap_id: formData.ovitrap,
-        schedule_by: user.id, // Use the user unique ID from Clerk
+        schedule_by: mongoUserId, // Use MongoDB _id instead of Clerk ID
         type: isRange ? 'range' : 'single',
         startDate: formData.startDate,
         endDate: isRange ? formData.endDate : null,
@@ -301,35 +305,21 @@ const Calendar = () => {
         task: formData.name,
         status: formData.status
       };
-
+  
       const response = selectedEvent
         ? await api.put(`/api/schedules/${selectedEvent.id}`, submitData)
         : await api.post('/api/schedules', submitData);
-
+  
       setSnackbar({
         open: true,
         message: `Event ${selectedEvent ? 'updated' : 'created'} successfully`,
         severity: 'success'
       });
-
-      // Refresh events using helper function
+  
+      // Refresh events
       const updatedResponse = await api.get('/api/schedules');
       setEvents(formatSchedulesToEvents(updatedResponse.data.schedules));
-
-      // Close dialog and reset form
       handleCloseDialog();
-      setSelectedEvent(null);
-      setIsFullDay(false);
-      setFormData({
-        startDate: "",
-        endDate: "",
-        startTime: "",
-        endTime: "",
-        name: "",
-        ovitrap: "Ovitrap 1",
-        status: "not done"
-      });
-
     } catch (error) {
       console.error('Error submitting form:', error);
       setSnackbar({
