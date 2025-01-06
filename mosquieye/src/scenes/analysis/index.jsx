@@ -469,6 +469,7 @@ const handleSubmit = async () => {
     }
 
     const analysisData = {
+      ovitrap: additionalData?.ovitrapId,
       singleEggs: singlesCount,
       clusteredEggs: parseInt(singlesCalculated),
       totalEggs: totalEggs,
