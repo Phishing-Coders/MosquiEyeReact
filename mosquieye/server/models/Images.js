@@ -24,6 +24,10 @@ const imageSchema = new mongoose.Schema({
     scan_by: String,
     ovitrap_type: String
   },
+  ovitrap: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Ovitrap'
+  },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users'

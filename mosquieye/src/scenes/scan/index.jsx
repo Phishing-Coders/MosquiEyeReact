@@ -4,14 +4,11 @@ import paperImage from '../../assets/type-paper-thumb.jpg';
 import magnifiedImage from '../../assets/type-magnified-thumb.jpg';
 import microImage from '../../assets/type-microscope-thumb.jpg';
 import Header from "../../components/Header";
-import Cropper from 'react-easy-crop';
-import { PhotoCamera, RotateRight, Cancel, CheckCircle } from '@mui/icons-material';
-import { Formik } from "formik";
+import { PhotoCamera, Cancel } from '@mui/icons-material';
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Box, Button, TextField, Slider, Container, Grid, Card, CardMedia, CardContent, Typography, Dialog } from "@mui/material";
+import { Box, Button, Container, Grid, Card, CardMedia, CardContent, Typography} from "@mui/material";
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';  // Update this line
 
 const Scan = () => {
   const isMobile = useMediaQuery("(min-width:600px)");
@@ -147,19 +144,23 @@ const Scan = () => {
   };
 
   return (
-    <Box m={isMobile ? "30px" : "30px"}>
+    <Box 
+      m={isMobile ? "30px" : "30px"}
+      sx={{
+        overflow: 'auto',
+      }}
+    >
       <Header title="Scan" subtitle="Upload Image to algorithmically detect mosquito eggs and egg cluster on ovitrap paper using computer vision." />
       <Container 
         maxWidth="lg" 
         sx={{ 
-          mt: 2, 
-          mb: isMobile ? 8 : 5,
-          px: isMobile ? 1 : 3 // Adjust padding for mobile
+          mt: 0, 
+          mb: isMobile ? 9 : 10,
+          px: isMobile ? 0 : 0 // Adjust padding for mobile
         }}
       >
         <Grid container justifyContent="center" alignItems="center">
           <Grid item xs={12} md={10}>
-              {/* <h2 style={{ textAlign: 'center' }}>Select the ovitrap image type</h2> */}
               <Typography
                 variant={isMobile ? "h5" : "h4"}
                 align="center"
@@ -168,80 +169,112 @@ const Scan = () => {
                 Select the ovitrap image type
               </Typography>
 
-              <Grid container spacing={2} justifyContent="center">
+              <Grid 
+                container 
+                spacing={3} 
+                justifyContent="center"
+                sx={{ 
+                  width: '100%',
+                  margin: '0 auto'
+                }}
+              >
                 {/*Paper Type Card*/}
-                <Grid item xs={1} md={3} style={{ display: 'flex' }}>
+                <Grid item xs={12} sm={6} md={4}>
                 <Card
                   onClick={() => handleToggle('paper')}
                   sx={{
+                    cursor: 'pointer',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
                     border: theme => imageType === 'paper' ? `2px solid ${theme.palette.common.white}` : 'none',
                     boxShadow: imageType === 'paper' ? 3 : 1,
-                    height: '100%',
-                    transition: '0.3s'
+                    transition: '0.3s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4
+                    }
                   }}
                 >
                     <CardMedia
                       component="img"
                       alt="Paper"
-                      height="140"
+                      height="200"
                       image={paperImage}
                       title="Paper"
+                      sx={{ objectFit: 'cover' }}
                     />
-                    <CardContent>
+                    <CardContent sx={{ flexGrow: 1 }}>
                       <h2>Paper Strip</h2>
-                      <Typography variant="body2" color="textSecondary" component="p">
+                      <Typography color="textSecondary" component="p">
                         {t('Ovitrap paper is rectangular in shape (approx. 32cm X 8cm), on white pellon fabric with gray-black mosquito eggs.')}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
 
-                <Grid item xs={1} md={3} style={{ display: 'flex' }}>
-                <Card
-                  onClick={() => handleToggle('magnified')}
-                  sx={{
-                    border: theme => imageType === 'magnified' ? `2px solid ${theme.palette.common.white}` : 'none',
-                    boxShadow: imageType === 'magnified' ? 3 : 1,
-                    height: '100%',
-                    transition: '0.3s'
-                  }}
-                >
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card
+                    onClick={() => handleToggle('magnified')}
+                    sx={{
+                      cursor: 'pointer',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      border: theme => imageType === 'magnified' ? `2px solid ${theme.palette.common.white}` : 'none',
+                      boxShadow: imageType === 'magnified' ? 3 : 1,
+                      transition: '0.3s',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4
+                      }
+                    }}
+                  >
                     <CardMedia
                       component="img"
                       alt="Magnified"
-                      height="140"
+                      height="200"
                       image={magnifiedImage}
                       title="Magnified"
+                      sx={{ objectFit: 'cover' }}
                     />
-                    <CardContent>
+                    <CardContent sx={{ flexGrow: 1 }}>
                       <h2>Magnified</h2>
-                      <Typography variant="body2" color="textSecondary" component="p">
+                      <Typography color="textSecondary" component="p">
                         {t('Ovitrap paper is less narrow than a paper strip, on white pellon fabric with gray-black mosquito eggs that appear larger in the image.')}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
 
-                <Grid item xs={1} md={3} style={{ display: 'flex' }}>
+                <Grid item xs={12} sm={6} md={4}>
                 <Card
                   onClick={() => handleToggle('micro')}
                   sx={{
+                    cursor: 'pointer',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
                     border: theme => imageType === 'micro' ? `2px solid ${theme.palette.common.white}` : 'none',
                     boxShadow: imageType === 'micro' ? 3 : 1,
-                    height: '100%',
-                    transition: '0.3s'
+                    transition: '0.3s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4
+                    }
                   }}
                 >
                     <CardMedia
                       component="img"
                       alt="Micro"
-                      height="140"
+                      height="200"
                       image={microImage}
                       title="Micro"
+                      sx={{ objectFit: 'cover' }}
                     />
-                    <CardContent>
+                    <CardContent sx={{ flexGrow: 1 }}>
                       <h2>Microscope</h2>
-                      <Typography variant="body2" color="textSecondary" component="p">
+                      <Typography color="textSecondary" component="p">
                         {t('Image is square, and mosquito eggs are clearly visible as large objects.')}
                       </Typography>
                     </CardContent>
@@ -256,7 +289,7 @@ const Scan = () => {
       <Box mb="20px" sx={{ mt: -5 }}>
         <Container>
           <Grid container justifyContent="center" alignItems="center">
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={15}>
               <Container>
                 <Grid container spacing={3} justifyContent="center" alignItems="center">
                   <Grid item xs={12}>
