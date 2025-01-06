@@ -4,14 +4,11 @@ import paperImage from '../../assets/type-paper-thumb.jpg';
 import magnifiedImage from '../../assets/type-magnified-thumb.jpg';
 import microImage from '../../assets/type-microscope-thumb.jpg';
 import Header from "../../components/Header";
-import Cropper from 'react-easy-crop';
-import { PhotoCamera, RotateRight, Cancel, CheckCircle } from '@mui/icons-material';
-import { Formik } from "formik";
+import { PhotoCamera, Cancel } from '@mui/icons-material';
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Box, Button, TextField, Slider, Container, Grid, Card, CardMedia, CardContent, Typography, Dialog } from "@mui/material";
+import { Box, Button, Container, Grid, Card, CardMedia, CardContent, Typography} from "@mui/material";
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';  // Update this line
 
 const Scan = () => {
   const isMobile = useMediaQuery("(min-width:600px)");
@@ -47,17 +44,9 @@ const Scan = () => {
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result);
-        // Reset other states related to cropping when a new image is uploaded
+        console.log("Image uploaded:", reader.result); // Debug log
         setCroppedImage(null);
         setCroppedAreaPixels(null);
-        
-        // Add scroll behavior
-        setTimeout(() => {
-          bottomSectionRef.current?.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }, 100);
       };
       reader.readAsDataURL(file);
     }
@@ -155,101 +144,137 @@ const Scan = () => {
   };
 
   return (
-    <Box m={isMobile ? "10px" : "20px"}>
+    <Box 
+      m={isMobile ? "30px" : "30px"}
+      sx={{
+        overflow: 'auto',
+      }}
+    >
       <Header title="Scan" subtitle="Upload Image to algorithmically detect mosquito eggs and egg cluster on ovitrap paper using computer vision." />
       <Container 
         maxWidth="lg" 
         sx={{ 
-          mt: 2, 
-          mb: isMobile ? 8 : 5,
-          px: isMobile ? 1 : 3 // Adjust padding for mobile
+          mt: 0, 
+          mb: isMobile ? 9 : 10,
+          px: isMobile ? 0 : 0 // Adjust padding for mobile
         }}
       >
         <Grid container justifyContent="center" alignItems="center">
           <Grid item xs={12} md={10}>
-              {/* <h2 style={{ textAlign: 'center' }}>Select the ovitrap image type</h2> */}
               <Typography
                 variant={isMobile ? "h5" : "h4"}
                 align="center"
-                sx={{ mb: 3 }}
+                sx={{ mb: 3, fontWeight: 'bold', fontSize: '1.4rem' }} 
               >
                 Select the ovitrap image type
               </Typography>
 
-              <Grid container spacing={2} justifyContent="center">
+              <Grid 
+                container 
+                spacing={3} 
+                justifyContent="center"
+                sx={{ 
+                  width: '100%',
+                  margin: '0 auto'
+                }}
+              >
                 {/*Paper Type Card*/}
-                <Grid item xs={1} md={3} style={{ display: 'flex' }}>
+                <Grid item xs={12} sm={6} md={4}>
                 <Card
                   onClick={() => handleToggle('paper')}
                   sx={{
-                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
-                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    cursor: 'pointer',
                     height: '100%',
-                    transition: '0.3s'
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.common.white}` : 'none',
+                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    transition: '0.3s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4
+                    }
                   }}
                 >
                     <CardMedia
                       component="img"
                       alt="Paper"
-                      height="140"
+                      height="200"
                       image={paperImage}
                       title="Paper"
+                      sx={{ objectFit: 'cover' }}
                     />
-                    <CardContent>
+                    <CardContent sx={{ flexGrow: 1 }}>
                       <h2>Paper Strip</h2>
-                      <Typography variant="body2" color="textSecondary" component="p">
+                      <Typography color="textSecondary" component="p">
                         {t('Ovitrap paper is rectangular in shape (approx. 32cm X 8cm), on white pellon fabric with gray-black mosquito eggs.')}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
 
-                <Grid item xs={1} md={3} style={{ display: 'flex' }}>
-                <Card
-                  onClick={() => handleToggle('paper')}
-                  sx={{
-                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
-                    boxShadow: imageType === 'paper' ? 3 : 1,
-                    height: '100%',
-                    transition: '0.3s'
-                  }}
-                >
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card
+                    onClick={() => handleToggle('magnified')}
+                    sx={{
+                      cursor: 'pointer',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      border: theme => imageType === 'magnified' ? `2px solid ${theme.palette.common.white}` : 'none',
+                      boxShadow: imageType === 'magnified' ? 3 : 1,
+                      transition: '0.3s',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4
+                      }
+                    }}
+                  >
                     <CardMedia
                       component="img"
                       alt="Magnified"
-                      height="140"
+                      height="200"
                       image={magnifiedImage}
                       title="Magnified"
+                      sx={{ objectFit: 'cover' }}
                     />
-                    <CardContent>
+                    <CardContent sx={{ flexGrow: 1 }}>
                       <h2>Magnified</h2>
-                      <Typography variant="body2" color="textSecondary" component="p">
+                      <Typography color="textSecondary" component="p">
                         {t('Ovitrap paper is less narrow than a paper strip, on white pellon fabric with gray-black mosquito eggs that appear larger in the image.')}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
 
-                <Grid item xs={1} md={3} style={{ display: 'flex' }}>
+                <Grid item xs={12} sm={6} md={4}>
                 <Card
-                  onClick={() => handleToggle('paper')}
+                  onClick={() => handleToggle('micro')}
                   sx={{
-                    border: theme => imageType === 'paper' ? `2px solid ${theme.palette.primary.main}` : 'none',
-                    boxShadow: imageType === 'paper' ? 3 : 1,
+                    cursor: 'pointer',
                     height: '100%',
-                    transition: '0.3s'
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: theme => imageType === 'micro' ? `2px solid ${theme.palette.common.white}` : 'none',
+                    boxShadow: imageType === 'micro' ? 3 : 1,
+                    transition: '0.3s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4
+                    }
                   }}
                 >
                     <CardMedia
                       component="img"
                       alt="Micro"
-                      height="140"
+                      height="200"
                       image={microImage}
                       title="Micro"
+                      sx={{ objectFit: 'cover' }}
                     />
-                    <CardContent>
+                    <CardContent sx={{ flexGrow: 1 }}>
                       <h2>Microscope</h2>
-                      <Typography variant="body2" color="textSecondary" component="p">
+                      <Typography color="textSecondary" component="p">
                         {t('Image is square, and mosquito eggs are clearly visible as large objects.')}
                       </Typography>
                     </CardContent>
@@ -264,7 +289,7 @@ const Scan = () => {
       <Box mb="20px" sx={{ mt: -5 }}>
         <Container>
           <Grid container justifyContent="center" alignItems="center">
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={15}>
               <Container>
                 <Grid container spacing={3} justifyContent="center" alignItems="center">
                   <Grid item xs={12}>
@@ -324,119 +349,31 @@ const Scan = () => {
       </Box>      
 
       <Box m="20px" ref={bottomSectionRef}>  
-        <Formik
-          onSubmit={handleFormSubmit}
-          initialValues={initialValues}
-          validationSchema={checkoutSchema}
-        >
-          {({
-            values,
-            errors,
-            touched,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-          }) => (
-            <form onSubmit={handleSubmit}>
-              {/* <Box
-                display="grid"
-                gap="30px"
-                gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                sx={{
-                  "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                }}
-              >
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="First Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.firstName}
-                  name="firstName"
-                  error={!!touched.firstName && !!errors.firstName}
-                  helperText={touched.firstName && errors.firstName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Last Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.lastName}
-                  name="lastName"
-                  error={!!touched.lastName && !!errors.lastName}
-                  helperText={touched.lastName && errors.lastName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Email"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.email}
-                  name="email"
-                  error={!!touched.email && !!errors.email}
-                  helperText={touched.email && errors.email}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Contact Number"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.contact}
-                  name="contact"
-                  error={!!touched.contact && !!errors.contact}
-                  helperText={touched.contact && errors.contact}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Address 1"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.address1}
-                  name="address1"
-                  error={!!touched.address1 && !!errors.address1}
-                  helperText={touched.address1 && errors.address1}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Address 2"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.address2}
-                  name="address2"
-                  error={!!touched.address2 && !!errors.address2}
-                  helperText={touched.address2 && errors.address2}
-                  sx={{ gridColumn: "span 4" }}
-                />
-              </Box> */}
-              <Box display="flex" justifyContent="center" mt="-10px">
-                <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
-                  Submit
-                </Button>
-                {/* <Box width="20px" />
-                <Button type="submit" color="secondary" variant="contained" onClick={() => handleToAnalysis(values)}>
-                  to analysis
-                </Button> */}
-              </Box>
-            </form>
-          )}
-        </Formik>
+        {imageSrc && (
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            mt={2}
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              marginBottom: '100px'  // Changed from 4 to 100px for more space
+            }}
+          >
+            <Button 
+              color="secondary" 
+              variant="contained" 
+              onClick={() => handleToAnalysis({})}
+              size="large"
+              sx={{
+                padding: '10px 30px',
+                fontSize: '1.1rem'
+              }}
+            >
+              Analyze Image
+            </Button>
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -20,7 +20,13 @@ const imageSchema = new mongoose.Schema({
     clustersTotalArea: Number,
     avgClusterArea: Number,
     avgEggsPerCluster: Number,
-    imageSize: String
+    imageSize: String,
+    scan_by: String,
+    ovitrap_type: String
+  },
+  ovitrap: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Ovitrap'
   },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,

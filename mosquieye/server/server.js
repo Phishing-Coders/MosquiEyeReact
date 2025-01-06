@@ -7,7 +7,8 @@ import mongoose from 'mongoose';
 import User from './models/Users.js';
 import userRoutes from './routes/user.js';
 import imagesRoutes from './routes/images.js';
-import schedulesRouter from './routes/schedules.js'; // Ensure this import exists
+import schedulesRouter from './routes/schedules.js';
+import ovitrapsRouter from './routes/ovitraps.js';
 
 dotenv.config();
 
@@ -143,13 +144,12 @@ app.get('/', (req, res) => {
 });
 app.use('/api/users', userRoutes);
 app.use('/api/images', imagesRoutes);
-app.use('/api/schedules', schedulesRouter); // Ensure this line exists
+app.use('/api/schedules', schedulesRouter);
+app.use('/api/ovitraps', ovitrapsRouter);
 
 // Update MongoDB connection with retry logic
 const connectWithRetry = () => {
   mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
     retryWrites: true,

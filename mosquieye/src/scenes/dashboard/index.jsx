@@ -3,16 +3,17 @@ import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import { useAuth } from "../../context/AuthContext";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
 import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
+import PestControlOutlinedIcon from '@mui/icons-material/PestControlOutlined';
+import FmdBadOutlinedIcon from '@mui/icons-material/FmdBadOutlined';
+import EmergencyOutlinedIcon from '@mui/icons-material/EmergencyOutlined';
+import SickOutlinedIcon from '@mui/icons-material/SickOutlined';
+
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -58,14 +59,18 @@ const Dashboard = () => {
         >
           <StatBox
             title="12,361"
-            subtitle="Emails Sent"
-            progress="0.75"
-            increase="+14%"
+            subtitle="Total Cases"
             icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              <SickOutlinedIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "50px" }}
               />
             }
+            sx={{
+              "& .MuiTypography-subtitle": {
+                textAlign: "center",
+                width: "100%"
+              }
+            }}
           />
         </Box>
         <Box
@@ -76,13 +81,11 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="431,225"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
+            title="4323"
+            subtitle="Total Death Cases"
             icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              <EmergencyOutlinedIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "50px" }}
               />
             }
           />
@@ -96,12 +99,10 @@ const Dashboard = () => {
         >
           <StatBox
             title="32,441"
-            subtitle="New Clients"
-            progress="0.30"
-            increase="+5%"
+            subtitle="Total Mosquito Egg"
             icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              <PestControlOutlinedIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "50px" }}
               />
             }
           />
@@ -114,13 +115,11 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
+            title="10"
+            subtitle="Total Hotspot"
             icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              <FmdBadOutlinedIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "50px" }}
               />
             }
           />
@@ -240,9 +239,9 @@ const Dashboard = () => {
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
             >
-              $48,352 revenue generated
+              Total Cases VS Total Death Cases
             </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
+            <Typography>-_-_-_-_-</Typography>
           </Box>
         </Box>
         <Box
