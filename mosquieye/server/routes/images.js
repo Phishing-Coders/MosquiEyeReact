@@ -89,4 +89,19 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Delete image by ID
+router.delete('/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const deletedImage = await Image.findOneAndDelete({ imageId });
+    if (!deletedImage) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({ message: 'Error deleting image', error: error.message });
+  }
+});
+
 export default router;
