@@ -4,7 +4,7 @@ const imageSchema = new mongoose.Schema({
   imageId: {
     type: String,
     required: true,
-    unique: true
+    unique: true // Ensure imageId is unique
   },
   ovitrapId: String,
   image: {
