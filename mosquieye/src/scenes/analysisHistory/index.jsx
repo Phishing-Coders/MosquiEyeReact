@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {Box, Typography, IconButton,Button,useTheme,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogContent, Collapse } from '@mui/material';
+import { Box, Typography, IconButton, Button, useTheme, Dialog, DialogContent, CircularProgress } from '@mui/material';
 import { tokens } from "../../theme";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import { DataGrid } from '@mui/x-data-grid';
+import DetailedAnalysisReport from './DetailedAnalysisReport';
+import generatePDFReport from './generatePDFReport';
+import { computeRiskLevel, NUMBER_HOUSES_INSPECTED, TOTAL_OVID_TRAPS } from './utils';
 import logoImage from '../../assets/favicon-9.png'; 
+import { useGridApiRef, gridFilteredSortedRowIdsSelector } from '@mui/x-data-grid'; // Add ref to access sorted/filtered rows
+import AnalysisHistoryTable from './AnalysisHistoryTable'; // <-- Import the new component
 
 const AnalysisHistory = () => {
   const theme = useTheme();
@@ -23,6 +24,23 @@ const AnalysisHistory = () => {
   const [openRowId, setOpenRowId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [isExportingXLSX, setIsExportingXLSX] = useState(false);
+  
+
+  // For DataGrid references
+  const apiRef = useGridApiRef();
+
+  // Add state for column visibility
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    singlesTotalArea: false,
+    singlesAvg: false,
+    clustersTotalArea: false,
+    avgClusterArea: false,
+    avgEggsPerCluster: false,
+    affectedAreaSingles: false,
+    affectedAreaClusters: false,
+  });
 
   useEffect(() => {
     fetchAnalyses();
@@ -30,13 +48,14 @@ const AnalysisHistory = () => {
   }, []);
 
   const fetchAnalyses = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('/api/images');
       setAnalyses(response.data.images);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching analyses:', error);
       setError('Failed to load analysis history');
+    } finally {
       setLoading(false);
     }
   };
@@ -45,7 +64,7 @@ const AnalysisHistory = () => {
     try {
       const response = await axios.get('/api/users');
       setUsers(response.data.users);
-      console.log('Fetched Users:', response.data.users); // Added log
+      
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -68,171 +87,22 @@ const AnalysisHistory = () => {
     setZoomLevel(1);
   };
 
-  const generatePDFReport = async () => {
-    const doc = new jsPDF({ orientation: 'landscape' });
+  const generateReport = async () => { // Remove the parameter
+    setIsGeneratingReport(true);
+    try {
+      const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef.current.state); // Retrieve row IDs from the grid
+      const displayedRows = filteredSortedRowIds.map((id) => {
+        const row = rows.find(r => r.id === id);
+        return row;
+      }).filter(row => row !== undefined);
 
-    // Load and add logo to title
-    const logo = new Image();
-    logo.src = logoImage;
-    await new Promise((resolve) => {
-      logo.onload = resolve;
-    });
-
-    // Add logo next to title
-    doc.addImage(logo, 'PNG', 14, 10, 20, 20);
-    doc.setFontSize(16);
-    doc.text('Analysis History Report', 40, 20);
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 40, 30);
-
-    // Add watermark with opacity
-    const watermarkWidth = 40;
-    const watermarkHeight = 40;
-    doc.addImage(
-      logo,
-      'PNG',
-      doc.internal.pageSize.width - watermarkWidth - 10,
-      doc.internal.pageSize.height - watermarkHeight - 10,
-      watermarkWidth,
-      watermarkHeight,
-      undefined,
-      'NONE',
-      0.5  // opacity value
-    );
-
-    // Main table
-    const mainTableData = rows.map((row, index) => [
-      index + 1,
-      row.imageType,
-      row.totalEggs,
-      row.singleEggs,
-      row.clusterEggs,
-      row.breteauIndex,
-      row.moi,
-      row.riskLevel,
-      row.date,
-      row.scanBy
-    ]);
-
-    doc.autoTable({
-      startY: 40,
-      head: [['No.', 'Image Type', 'Total Eggs', 'Single Eggs', 'Cluster Eggs', 'Breteau Index (BI)', 'Mosquito Ovitrap Index (MOI)', 'Risk Level', 'Date', 'Scan By']],
-      body: mainTableData,
-      theme: 'grid',
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [22, 160, 133] }
-    });
-
-    // Additional pages for each analysis
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      const analysis = analyses[i];
-      const analysisId = analysis?.imageId || 'N/A';
-
-      // Image page (portrait)
-      doc.addPage('portrait');
-      // Add watermark to new page with opacity
-      doc.addImage(
-        logo,
-        'PNG',
-        doc.internal.pageSize.width - watermarkWidth - 10,
-        doc.internal.pageSize.height - watermarkHeight - 10,
-        watermarkWidth,
-        watermarkHeight,
-        undefined,
-        'NONE',
-        0.1
-      );
-
-      doc.setFontSize(14);
-      doc.text(`No. ${i + 1}`, 14, 20);
-      doc.text(`Analysis ID: ${analysisId}`, 14, 30);
-
-      try {
-        const response = await axios.get(`api/images/${analysisId}`, { responseType: 'arraybuffer' });
-        const base64Image = Buffer.from(response.data, 'binary').toString('base64');
-        
-        // Calculate dimensions to fit page
-        const pageWidth = doc.internal.pageSize.width;
-        const pageHeight = doc.internal.pageSize.height;
-        const margin = 20;
-        const maxWidth = pageWidth - (2 * margin);
-        const maxHeight = pageHeight - 60; // Account for header text
-        
-        // Create temporary image to get dimensions
-        const img = new Image();
-        img.src = `data:image/jpeg;base64,${base64Image}`;
-        await new Promise((resolve) => {
-          img.onload = resolve;
-        });
-        
-        // Calculate scaled dimensions
-        let imgWidth = maxWidth;
-        let imgHeight = (img.height * maxWidth) / img.width;
-        
-        if (imgHeight > maxHeight) {
-          imgHeight = maxHeight;
-          imgWidth = (img.width * maxHeight) / img.height;
-        }
-        
-        // Center the image horizontally
-        const xOffset = (pageWidth - imgWidth) / 2;
-        
-        doc.addImage(
-          `data:image/jpeg;base64,${base64Image}`,
-          'JPEG',
-          xOffset,
-          40,
-          imgWidth,
-          imgHeight
-        );
-      } catch (error) {
-        doc.text('Image not available.', 14, 40);
-      }
-
-      // Data table page (portrait)
-      doc.addPage('portrait');
-      // Add watermark to new page with opacity
-      doc.addImage(
-        logo,
-        'PNG',
-        doc.internal.pageSize.width - watermarkWidth - 10,
-        doc.internal.pageSize.height - watermarkHeight - 10,
-        watermarkWidth,
-        watermarkHeight,
-        undefined,
-        'NONE',
-        0.1
-      );
-
-      doc.setFontSize(14);
-      doc.text(`No. ${i + 1}`, 14, 20);
-      doc.text(`Analysis ID: ${analysisId}`, 14, 30);
-
-      const fields = Object.entries(analysis.analysisData || {});
-      const extraData = fields.map(([key, value]) => [key, String(value)]);
-
-      doc.autoTable({
-        startY: 40,
-        head: [['Field', 'Value']],
-        body: extraData,
-        theme: 'striped',
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [39, 174, 96] }
-      });
+      await generatePDFReport(displayedRows, users, logoImage); // Pass the rows instead of apiRef
+    } catch (error) {
+      console.error('Error generating report:', error);
+      // Optionally, set an error state here to notify the user
+    } finally {
+      setIsGeneratingReport(false);
     }
-
-    doc.save('analysis-history-report.pdf');
-  };
-
-  // Define constants for calculations
-  const NUMBER_HOUSES_INSPECTED = 10; // Adjust as needed
-  const TOTAL_OVID_TRAPS = 10; // Adjust as needed
-
-  const computeRiskLevel = (bi, moi) => {
-    if (bi >= 20 || moi >= 40) return 'High';
-    if (bi >= 5 || moi >= 10) return 'Medium';
-    return 'Low';
   };
 
   const handleOpenDeleteDialog = (imageId) => {
@@ -262,72 +132,57 @@ const AnalysisHistory = () => {
     handleOpenDeleteDialog(imageId);
   };
 
-  const columns = [
-    {
-      field: 'expand',
-      headerName: '',
-      width: 50,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <IconButton
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleRow(params.row.id);
-          }}
-          size="small"
-        >
-          {openRowId === params.row.id ? '-' : '+'}
-        </IconButton>
-      ),
-    },
-    {
-      field: 'image',
-      headerName: 'Image',
-      flex: 1,
-      renderCell: (params) => (
-        <Box display="flex" justifyContent="center" alignItems="center" padding={1.5}>
-          <img
-            src={params.row.imageUrl}
-            alt="Analysis result"
-            style={{ width: '80px', cursor: 'pointer' }}
-            onClick={() => setSelectedImage(params.row.imageUrl)}
-            onError={(e) => { e.target.src = 'https://via.placeholder.com/80?text=No+Image'; }}
-          />
-        </Box>
-      ),
-    },
-    { field: 'imageType', headerName: 'Image Type', flex: 1 },
-    { field: 'totalEggs', headerName: 'Total Eggs', flex: 1 },
-    { field: 'singleEggs', headerName: 'Single Eggs', flex: 1 },
-    { field: 'clusterEggs', headerName: 'Cluster Eggs', flex: 1 },
-    { field: 'breteauIndex', headerName: 'Breteau Index (BI)', flex: 1 },
-    { field: 'moi', headerName: 'Mosquito Ovitrap Index (MOI)', flex: 1 },
-    { field: 'riskLevel', headerName: 'Risk Level', flex: 1 },
-    { field: 'date', headerName: 'Date', flex: 1 },
-    { field: 'scanBy', headerName: 'Scan By', flex: 1 },
-  ];
+  // Moved columns, row generation, handleExportCSV to AnalysisHistoryTable.jsx
+  // Now just generate 'rows' in the same way or you can pass 'analyses' to AnalysisHistoryTable for row-building there.
 
+  // Example row building here:
+  // Build a userMap to map clerkUserId to full name
   const userMap = users.reduce((acc, user) => {
     acc[user.clerkUserId] = `${user.firstName} ${user.lastName}`;
     return acc;
   }, {});
-  console.log('User Map:', userMap); // Added log
 
-  const rows = analyses.map((analysis) => {
+  const rows = analyses.map((analysis, index) => {
+    console.log('Raw createdAt:', analysis.createdAt); // Log 1: Raw date from API
+    const dateObj = new Date(analysis.createdAt);
+    console.log('Parsed Date object:', dateObj); // Log 2: Date object after parsing
+
     const totalEggs = analysis.analysisData.totalEggs || 0;
     const singleEggs = analysis.analysisData.singleEggs || 0;
     const clusterEggs = analysis.analysisData.clustersCount || 0;
     const imageType = analysis.analysisData.ovitrap_type || 'Unknown';
+
+    const singlesTotalArea = analysis.analysisData.singlesTotalArea || 0;
+    const singlesAvg = analysis.analysisData.singlesAvg || 0;
+    const clustersTotalArea = analysis.analysisData.clustersTotalArea || 0;
+    const avgClusterArea = analysis.analysisData.avgClusterArea || 0;
+    const avgEggsPerCluster = analysis.analysisData.avgEggsPerCluster || 0;
+
+    const affectedAreaSingles = singleEggs ? (singlesTotalArea / singleEggs).toFixed(2) : '0';
+    const affectedAreaClusters = clusterEggs ? (clustersTotalArea / clusterEggs).toFixed(2) : '0';
 
     const breteauIndex = parseFloat(((clusterEggs / NUMBER_HOUSES_INSPECTED) * 100).toFixed(2));
     const positiveOvitraps = singleEggs > 0 || clusterEggs > 0 ? 1 : 0; // Assuming each row represents one ovitrap
     const moi = parseFloat(((positiveOvitraps / TOTAL_OVID_TRAPS) * 100).toFixed(2));
     const riskLevel = computeRiskLevel(breteauIndex, moi);
 
-    return {
-      id: analysis.imageId,
-      imageUrl: `/api/images/${analysis.imageId}`,
+    // Validate and extract a unique primitive ID
+    let uniqueId;
+    if (typeof analysis.imageId === 'string' || typeof analysis.imageId === 'number') {
+      uniqueId = String(analysis.imageId);
+    } else if (typeof analysis.imageId === 'object' && analysis.imageId !== null) {
+      // If imageId is an object, extract a unique property or use the index as a fallback
+      uniqueId = analysis.imageId.id ? String(analysis.imageId.id) : `unknown-id-${index}`;
+      console.warn(`imageId is an object. Assigned uniqueId: ${uniqueId}`);
+    } else {
+      // Fallback for unexpected imageId types
+      uniqueId = `invalid-id-${index}`;
+      console.error(`Invalid imageId type: ${typeof analysis.imageId}. Assigned uniqueId: ${uniqueId}`);
+    }
+
+    const rowData = {
+      id: uniqueId, // Ensure id is a unique string
+      imageUrl: `${window.location.origin}/api/images/${uniqueId}`, // Ensure imageUrl is absolute
       imageType,
       totalEggs,
       singleEggs,
@@ -335,19 +190,26 @@ const AnalysisHistory = () => {
       breteauIndex,
       moi,
       riskLevel,
-      date: new Date(analysis.createdAt).toLocaleDateString(),
+      date: dateObj, // Store the Date object directly
       scanBy: userMap[analysis.analysisData.scan_by] || 'Unknown',
+      analysisData: analysis.analysisData,
+      singlesTotalArea,
+      singlesAvg,
+      clustersTotalArea,
+      avgClusterArea,
+      avgEggsPerCluster,
+      affectedAreaSingles,
+      affectedAreaClusters,
     };
-  });
+
+    console.log('Row data:', rowData); // Verify the row data
+    return rowData;
+  }).filter(row => row !== null && row.id); // Ensure no rows have null or undefined ids
   console.log('Rows:', rows); // Added log
 
   const toggleRow = (id) => {
     setOpenRowId(openRowId === id ? null : id);
   };
-
-  if (loading) {
-    return <Typography>Loading...</Typography>;
-  }
 
   if (error) {
     return <Typography color="error">{error}</Typography>;
@@ -361,105 +223,42 @@ const AnalysisHistory = () => {
         </Box>
         <Button
           variant="contained"
-          onClick={generatePDFReport}
-          sx={{
-            backgroundColor: colors.blueAccent[700],
-            '&:hover': { backgroundColor: colors.blueAccent[600] },
-          }}
+          onClick={generateReport}
+          disabled={isGeneratingReport}
+          sx={{ backgroundColor: colors.blueAccent[700], '&:hover': { backgroundColor: colors.blueAccent[600] }, minWidth: '150px' }}
         >
-          Generate Report
+          {isGeneratingReport ? <CircularProgress size={24} color="inherit" /> : 'Generate Report'}
         </Button>
       </Box>
 
-      <Typography 
-        variant="subtitle2" 
-        sx={{ 
-          marginBottom: 2,
-          color: colors.grey[300],
-          fontStyle: 'italic'
-        }}
-      >
+      <Typography variant="subtitle2" sx={{ marginBottom: 2, color: colors.grey[300], fontStyle: 'italic' }}>
         Note: Breteau Index (BI), Mosquito Ovitrap Index (MOI), and Risk Level calculations are for reference purposes only.
       </Typography>
 
-      <Box style={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-          pagination  // Add this line to enable pagination
-          components={{
-            NoRowsOverlay: () => (
-              <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                <Typography>No records found</Typography>
-              </Box>
-            ),
-          }}
-        />
-      </Box>
+      <AnalysisHistoryTable
+        apiRef={apiRef}
+        rows={rows}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
+        isExportingXLSX={isExportingXLSX}
+        setIsExportingXLSX={setIsExportingXLSX}
+        onToggleRow={toggleRow}
+        openRowId={openRowId}
+        loading={loading} 
+        handleDelete={handleDelete} // Pass handleDelete as a prop
+        users={users}
+        refreshData={fetchAnalyses}  // Add this prop
+      />
 
       {/* Collapsible Details Panel */}
-      {openRowId && (
-        <Paper style={{ margin: '20px 0', padding: '20px', marginBottom: '100px' }}>
-          <Typography variant="h6" gutterBottom>
-            Detailed Analysis Report
-          </Typography>
-          <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={3}>
-            {(() => {
-              const analysis = analyses.find(a => a.imageId === openRowId);
-              const data = analysis?.analysisData || {};
-              const breteauIndex = parseFloat(((data.clustersCount || 0) / NUMBER_HOUSES_INSPECTED * 100).toFixed(2));
-              const positiveOvitraps = (data.singleEggs > 0 || data.clusterEggs > 0) ? 1 : 0; // Adjust as needed
-              const moi = parseFloat(((positiveOvitraps / TOTAL_OVID_TRAPS) * 100).toFixed(2));
-              const riskLevel = computeRiskLevel(breteauIndex, moi);
-
-              const affectedAreaSingles = data.singleEggs > 0 ? (data.singlesTotalArea || 0) / positiveOvitraps : 0;
-              const affectedAreaClusters = data.clustersCount > 0 ? (data.clustersTotalArea || 0) / data.clustersCount : 0;
-
-              const detailsToShow = [
-                { label: 'Date', value: new Date(analysis?.createdAt).toLocaleDateString() },
-                { label: 'Image Type', value: data.ovitrap_type || 'Unknown' },
-                { label: 'Scan By', value: userMap[data.scan_by] || 'Unknown' },
-                { label: 'Single Eggs', value: data.singleEggs },
-                { label: 'Cluster Eggs', value: data.clustersCount },
-                { label: 'Total Eggs', value: data.totalEggs },
-                { label: 'Singles Total Area', value: `${data.singlesTotalArea?.toFixed(2) || 0} px²` },
-                { label: 'Singles Average Size', value: `${data.singlesAvg?.toFixed(2) || 0} px²` },
-                { label: 'Clusters Count', value: data.clustersCount },
-                { label: 'Clusters Total Area', value: `${data.clustersTotalArea?.toFixed(2) || 0} px²` },
-                { label: 'Average Cluster Area', value: `${data.avgClusterArea?.toFixed(2) || 0} px²` },
-                { label: 'Average Eggs Per Cluster', value: data.avgEggsPerCluster?.toFixed(2) || 0 },
-                { label: 'Breteau Index (BI)', value: breteauIndex },
-                { label: 'Mosquito Ovitrap Index (MOI)', value: `${moi}%` },
-                { label: 'Risk Level', value: riskLevel },
-                { label: 'Affected Area (Singles)', value: `${affectedAreaSingles.toFixed(2)} px²` },
-                { label: 'Affected Area (Clusters)', value: `${affectedAreaClusters.toFixed(2)} px²` },
-              ];
-
-              return detailsToShow.map(({ label, value }) => (
-                <Box key={label} bgcolor={colors.primary[400]} p={2} borderRadius="4px">
-                  <Typography variant="subtitle2" color={colors.grey[100]} fontWeight="bold">
-                    {label}
-                  </Typography>
-                  <Typography variant="body1" color={colors.grey[100]}>
-                    {value}
-                  </Typography>
-                </Box>
-              ));
-            })()}
-          </Box>
-          <Box mt={2}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => handleDelete(openRowId)}
-            >
-              Delete
-            </Button>
-          </Box>
-        </Paper>
-      )}
+      <DetailedAnalysisReport
+        openRowId={openRowId}
+        analyses={analyses}
+        userMap={userMap}
+        computeRiskLevel={computeRiskLevel}
+        colors={colors}
+        handleDelete={handleDelete}
+      />
 
       <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
         <DialogContent>
