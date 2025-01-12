@@ -8,10 +8,12 @@ import { PhotoCamera, Cancel } from '@mui/icons-material';
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Box, Button, Container, Grid, Card, CardMedia, CardContent, Typography} from "@mui/material";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Scan = () => {
   const isMobile = useMediaQuery("(min-width:600px)");
+  const location = useLocation();
+  const { ovitrapId, ovitrapData } = location.state || {};
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -117,7 +119,16 @@ const Scan = () => {
     formData.append('address2', values.address2);
     formData.append('picture', imageSrc);
 
-    navigate('/analysis', { state: { imageData: imageSrc, imageType, ...values } }); 
+    navigate('/analysis', { 
+      state: { 
+        imageData: imageSrc, 
+        imageType,
+        additionalData: {
+          ovitrapId: ovitrapId,
+          ...ovitrapData
+        },
+        ...values 
+      } }); 
   };
 
   const resetCroppa = () => {
@@ -144,6 +155,7 @@ const Scan = () => {
   };
 
   return (
+    console.log("OVITRAP ID:", ovitrapId), // Debug log
     <Box 
       m={isMobile ? "30px" : "30px"}
       sx={{

@@ -208,7 +208,7 @@ const AnalysisHistory = () => {
       doc.text(`Analysis ID: ${analysisId}`, 14, 30);
 
       const fields = Object.entries(analysis.analysisData || {});
-      const extraData = fields.map(([key, value]) => [key, String(value)]);
+      const extraData = fields.map(([key, value]) => [key, String(value)]); 
 
       doc.autoTable({
         startY: 40,
