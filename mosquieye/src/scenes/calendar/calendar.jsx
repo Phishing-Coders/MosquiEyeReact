@@ -75,6 +75,7 @@ const Calendar = () => {
   });
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // Add this state
   const { user } = useUser(); // Add this line to get the user object
+  const [ovitraps, setOvitraps] = useState([]); // Add this state
 
   // Add this useEffect to fetch schedules when component mounts
   useEffect(() => {
@@ -95,6 +96,25 @@ const Calendar = () => {
       setEvents([]);
       setCurrentEvents([]);
     };
+  }, []);
+
+  // Add this useEffect to fetch ovitraps
+  useEffect(() => {
+    const fetchOvitraps = async () => {
+      try {
+        const response = await api.get('/api/ovitraps');
+        setOvitraps(response.data.ovitraps);
+      } catch (error) {
+        console.error('Error fetching ovitraps:', error);
+        setSnackbar({
+          open: true,
+          message: 'Error fetching ovitraps',
+          severity: 'error'
+        });
+      }
+    };
+
+    fetchOvitraps();
   }, []);
 
   // Add new handler for date clicks
@@ -582,6 +602,7 @@ const Calendar = () => {
         isFullDay={isFullDay}
         setIsFullDay={setIsFullDay}
         handleDelete={handleDelete}
+        ovitraps={ovitraps} // Pass ovitraps to EventDialog
       />
     </Box>
   );

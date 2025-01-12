@@ -8,7 +8,7 @@ import Header from "../../components/Header";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { DataGrid } from '@mui/x-data-grid';
-import logoImage from '../../assets/favicon-9.png'; // Add this import for your logo
+import logoImage from '../../assets/favicon-9.png'; 
 
 const AnalysisHistory = () => {
   const theme = useTheme();
@@ -21,6 +21,8 @@ const AnalysisHistory = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [users, setUsers] = useState([]);
   const [openRowId, setOpenRowId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   useEffect(() => {
     fetchAnalyses();
@@ -147,7 +149,7 @@ const AnalysisHistory = () => {
       doc.text(`Analysis ID: ${analysisId}`, 14, 30);
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/images/${analysisId}`, { responseType: 'arraybuffer' });
+        const response = await axios.get(`api/images/${analysisId}`, { responseType: 'arraybuffer' });
         const base64Image = Buffer.from(response.data, 'binary').toString('base64');
         
         // Calculate dimensions to fit page
@@ -233,6 +235,33 @@ const AnalysisHistory = () => {
     return 'Low';
   };
 
+  const handleOpenDeleteDialog = (imageId) => {
+    setDeleteTargetId(imageId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) return;
+    try {
+      await axios.delete(`/api/images/${deleteTargetId}`);
+      setAnalyses((prev) => prev.filter((a) => a.imageId !== deleteTargetId));
+      setOpenRowId(null);
+    } catch (err) {
+      console.error('Error deleting analysis:', err);
+    } finally {
+      handleCloseDeleteDialog();
+    }
+  };
+
+  const handleDelete = (imageId) => {
+    handleOpenDeleteDialog(imageId);
+  };
+
   const columns = [
     {
       field: 'expand',
@@ -263,6 +292,7 @@ const AnalysisHistory = () => {
             alt="Analysis result"
             style={{ width: '80px', cursor: 'pointer' }}
             onClick={() => setSelectedImage(params.row.imageUrl)}
+            onError={(e) => { e.target.src = 'https://via.placeholder.com/80?text=No+Image'; }}
           />
         </Box>
       ),
@@ -297,7 +327,7 @@ const AnalysisHistory = () => {
 
     return {
       id: analysis.imageId,
-      imageUrl: `http://localhost:5000/api/images/${analysis.imageId}`,
+      imageUrl: `/api/images/${analysis.imageId}`,
       imageType,
       totalEggs,
       singleEggs,
@@ -419,8 +449,29 @@ const AnalysisHistory = () => {
               ));
             })()}
           </Box>
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => handleDelete(openRowId)}
+            >
+              Delete
+            </Button>
+          </Box>
         </Paper>
       )}
+
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this analysis?</Typography>
+          <Box mt={2} display="flex" justifyContent="space-between">
+            <Button color='white' onClick={handleCloseDeleteDialog}>Cancel</Button>
+            <Button color="error" variant="contained" onClick={handleConfirmDelete}>
+              Confirm
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
 
       <Dialog 
         open={!!selectedImage} 
