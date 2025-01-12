@@ -33,7 +33,18 @@ const userSchema = new mongoose.Schema({
       'maps',
       'scan',
       'analysis',
-      'settings'
+      'settings',
+      'contacts',
+      'qrscan',
+      'calendar',
+      'geography',
+      'faq',
+      'bar',
+      'form',
+      'line',
+      'pie',
+      'ovitrap',
+      'analysisHistory'
     ]
   }],
   organizationId: String,

@@ -7,6 +7,7 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
+import { OrganizationProfile, OrganizationList, OrganizationSwitcher } from '@clerk/clerk-react';
 
 const Team = () => {
   const theme = useTheme();
@@ -73,12 +74,13 @@ const Team = () => {
             }
             borderRadius="4px"
           >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
+            {/* {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
             {access === "manager" && <SecurityOutlinedIcon />}
             {access === "user" && <LockOpenOutlinedIcon />}
             <Typography color={colors.grey[100]} sx={{ ml: 1 }}>
               {access}
-            </Typography>
+            </Typography> */}
+            <OrganizationSwitcher />
           </Box>
         );
       },
@@ -113,7 +115,7 @@ const Team = () => {
             backgroundColor: colors.blueAccent[700],
           },
           "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
+            color: `${colors.primary[400]} !important`,
           },
         }}
       >

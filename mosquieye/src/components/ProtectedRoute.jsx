@@ -18,8 +18,8 @@ const ProtectedRoute = ({ element, permission }) => {
   const rolePermissions = {
     'org:admin': ['dashboard', 'team', 'profile', 'maps', 'scan', 'analysis', 'settings', 'contacts', 'qrscan', 
                   'calendar', 'geography', 'faq', 'bar', 'form', 'line', 'pie', 'ovitrap', 'analysisHistory'],
-    'org:health_office': ['dashboard', 'maps', 'scan', 'analysis', 'profile'],
-    'org:operations_team': ['scan', 'analysis', 'profile']
+    'org:operations_team': ['dashboard', 'team', 'profile', 'maps', 'scan', 'analysis', 'settings', 'contacts', 'qrscan', 
+      'calendar', 'geography', 'faq', 'bar', 'form', 'line', 'pie', 'ovitrap', 'analysisHistory']
   };
 
   const userPermissions = rolePermissions[userRole] || [];
