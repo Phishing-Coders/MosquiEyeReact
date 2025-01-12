@@ -48,13 +48,14 @@ const AnalysisHistory = () => {
   }, []);
 
   const fetchAnalyses = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('/api/images');
       setAnalyses(response.data.images);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching analyses:', error);
       setError('Failed to load analysis history');
+    } finally {
       setLoading(false);
     }
   };
@@ -246,6 +247,7 @@ const AnalysisHistory = () => {
         loading={loading} 
         handleDelete={handleDelete} // Pass handleDelete as a prop
         users={users}
+        refreshData={fetchAnalyses}  // Add this prop
       />
 
       {/* Collapsible Details Panel */}

@@ -82,14 +82,14 @@ router.get('/', async (req, res) => {
 router.put('/:imageId', async (req, res) => {
   try {
     const { imageId } = req.params;
-    const { breteauIndex, moi, riskLevel, imageUrl, ...updateData } = req.body; // Exclude non-editable fields
+    const { analysisData } = req.body; // Now expecting analysisData object
 
     console.log(`Received PUT request for imageId: ${imageId}`);
-    console.log('Update data:', updateData);
+    console.log('Update data:', analysisData);
 
     const updatedImage = await Image.findOneAndUpdate(
       { imageId },
-      { $set: updateData },
+      { $set: { analysisData } }, // Update the entire analysisData object
       { new: true, runValidators: true }
     );
 

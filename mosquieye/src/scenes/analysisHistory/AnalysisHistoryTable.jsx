@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { Button, Box, Typography, IconButton, CircularProgress, Snackbar, Alert, Select, MenuItem } from '@mui/material'; // Update imports
+import { Button, Box, Typography, IconButton, CircularProgress, Snackbar, Alert, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'; // Add Dialog imports
 import { Delete as DeleteIcon, Edit as EditIcon, Save, Cancel as CancelIcon } from '@mui/icons-material'; // Update imports
 import ExcelJS from 'exceljs';
 import axios from 'axios';
@@ -56,6 +56,7 @@ const CustomToolbar = ({ onExport, isExportingXLSX }) => {
   );
 };
 
+// Add refreshData prop to component parameters
 const AnalysisHistoryTable = ({
   rows,
   columnVisibilityModel,
@@ -67,12 +68,15 @@ const AnalysisHistoryTable = ({
   apiRef,
   loading,
   handleDelete,
-  users
+  users,
+  refreshData  // Add this prop
 }) => {
   const [editingRowId, setEditingRowId] = useState(null); // Track the row being edited
   const [savingRowIds, setSavingRowIds] = useState([]); // Track rows being saved
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' }); // Notification state
   const [rowModesModel, setRowModesModel] = useState({}); // Add rowModesModel state
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [pendingSaveId, setPendingSaveId] = useState(null);
 
   // Add handleCloseNotification function
   const handleCloseNotification = () => {
@@ -84,7 +88,51 @@ const AnalysisHistoryTable = ({
   };
 
   const handleSaveClick = (id) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+    setPendingSaveId(id);
+    setSaveDialogOpen(true);
+  };
+
+  // Modify handleConfirmSave to actually process the update
+  const handleConfirmSave = async () => {
+    if (pendingSaveId) {
+      try {
+        // Get the current row data
+        const editedRow = rows.find(row => row.id === pendingSaveId);
+        if (editedRow) {
+          // Process the update
+          await processRowUpdate(editedRow);
+          
+          // Refresh the data after successful update
+          await refreshData();
+          
+          // Change mode back to view
+          setRowModesModel(prev => ({
+            ...prev,
+            [pendingSaveId]: { mode: GridRowModes.View }
+          }));
+          
+          setNotification({
+            open: true,
+            message: 'Successfully updated the analysis.',
+            severity: 'success'
+          });
+        }
+      } catch (error) {
+        console.error('Error saving changes:', error);
+        setNotification({
+          open: true,
+          message: 'Failed to save changes',
+          severity: 'error'
+        });
+      }
+    }
+    setSaveDialogOpen(false);
+    setPendingSaveId(null);
+  };
+
+  const handleCancelSave = () => {
+    setPendingSaveId(null);
+    setSaveDialogOpen(false);
   };
 
   const handleDeleteClick = (id) => () => {
@@ -102,20 +150,67 @@ const AnalysisHistoryTable = ({
     }
   };
 
-  const processRowUpdate = async (newRow) => {
-    try {
-      // Destructure to exclude non-editable fields
-      const { breteauIndex, moi, riskLevel, imageUrl, ...editableData } = newRow;
+  const processRowUpdate = React.useCallback(
+    async (newRow) => {
+      try {
+        // Get the current row's complete data
+        const currentRow = rows.find(row => row.id === newRow.id);
+        if (!currentRow) {
+          throw new Error('Row not found');
+        }
 
-      await axios.put(`/api/images/${newRow.id}`, editableData); // Send only editable fields
-      setNotification({ open: true, message: 'Successfully updated the analysis.', severity: 'success' });
-      return newRow;
-    } catch (error) {
-      console.error('Error updating analysis:', error);
-      setNotification({ open: true, message: 'Failed to update the analysis.', severity: 'error' });
-      throw error;
+        // Create updated analysis data
+        const updatedAnalysisData = {
+          ...currentRow.analysisData,
+          totalEggs: parseInt(newRow.totalEggs) || 0,
+          singleEggs: parseInt(newRow.singleEggs) || 0,
+          clustersCount: parseInt(newRow.clusterEggs) || 0,
+          singlesTotalArea: parseFloat(newRow.singlesTotalArea) || 0,
+          singlesAvg: parseFloat(newRow.singlesAvg) || 0,
+          clustersTotalArea: parseFloat(newRow.clustersTotalArea) || 0,
+          avgClusterArea: parseFloat(newRow.avgClusterArea) || 0,
+          avgEggsPerCluster: parseFloat(newRow.avgEggsPerCluster) || 0,
+          ovitrap_type: newRow.imageType || currentRow.analysisData.ovitrap_type,
+          scan_by: users.find(u => `${u.firstName} ${u.lastName}` === newRow.scanBy)?.clerkUserId || currentRow.analysisData.scan_by
+        };
+
+        console.log('Sending update data:', {
+          analysisData: updatedAnalysisData
+        });
+
+        const response = await axios.put(`/api/images/${newRow.id}`, {
+          analysisData: updatedAnalysisData
+        });
+
+        if (response.status === 200) {
+          await refreshData();
+          setNotification({
+            open: true,
+            message: 'Successfully updated the analysis.',
+            severity: 'success'
+          });
+          return newRow;
+        } else {
+          throw new Error('Update failed');
+        }
+      } catch (error) {
+        console.error('Error updating analysis:', error);
+        setNotification({
+          open: true,
+          message: 'Failed to update the analysis.',
+          severity: 'error'
+        });
+        throw error;
+      }
+    },
+    [refreshData, users, rows] // Add rows to dependencies
+  );
+
+  const handleRowEditStop = React.useCallback((params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
     }
-  };
+  }, []);
 
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
@@ -223,7 +318,7 @@ const AnalysisHistoryTable = ({
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 100,
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
@@ -386,57 +481,100 @@ const AnalysisHistoryTable = ({
   };
 
   return (
-    <Box style={{ height: 600, width: '100%' }}>
-      <DataGrid
-        apiRef={apiRef} // Pass apiRef to the DataGrid
-        rows={rows}
-        columns={editableColumns} // Use the updated columns
-        rowHeight={60}
-        pagination
-        pageSize={5}
-        rowsPerPageOptions={[5, 10, 20]}
-        columnVisibilityModel={columnVisibilityModel}
-        onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-        slots={{
-          toolbar: () => <CustomToolbar onExport={handleExportCSV} isExportingXLSX={isExportingXLSX} />, // Pass isExportingXLSX to CustomToolbar
-          noRowsOverlay: () => (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-              <Typography>No records found</Typography>
-            </Box>
-          ),
-          loadingOverlay: CustomLoadingOverlay // Add the custom loading overlay
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-            sx: {
-              color: 'white',
-              '& .MuiButton-text': { color: 'white' },
-              '& .MuiInput-root': { color: 'white' },
-              '& .MuiIconButton-root': { color: 'white' },
+    <>
+      <Box style={{ height: 600, width: '100%', marginBottom: '6rem' }}>  {/* Add marginBottom here */}
+        <DataGrid
+          apiRef={apiRef} // Pass apiRef to the DataGrid
+          rows={rows}
+          columns={editableColumns} // Use the updated columns
+          rowHeight={60}
+          pagination
+          pageSize={5}
+          rowsPerPageOptions={[5, 10, 20]}
+          columnVisibilityModel={columnVisibilityModel}
+          onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+          slots={{
+            toolbar: () => <CustomToolbar onExport={handleExportCSV} isExportingXLSX={isExportingXLSX} />, // Pass isExportingXLSX to CustomToolbar
+            noRowsOverlay: () => (
+              <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                <Typography>No records found</Typography>
+              </Box>
+            ),
+            loadingOverlay: CustomLoadingOverlay // Add the custom loading overlay
+          }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+              sx: {
+                color: 'white',
+                '& .MuiButton-text': { color: 'white' },
+                '& .MuiInput-root': { color: 'white' },
+                '& .MuiIconButton-root': { color: 'white' },
+              },
             },
-          },
+          }}
+          loading={loading || isExportingXLSX} // Update the loading prop
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={handleRowModesModelChange}
+          processRowUpdate={processRowUpdate}
+          editMode="row"
+          onRowEditStop={handleRowEditStop}
+          onProcessRowUpdateError={handleProcessRowUpdateError} // Add this line
+        />
+        <Snackbar
+          open={notification.open}
+          autoHideDuration={3000}
+          onClose={handleCloseNotification} // Use the defined handler
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={handleCloseNotification} severity={notification.severity} sx={{ width: '100%' }}>
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+      
+      {/* Add the confirmation dialog */}
+      <Dialog
+        open={saveDialogOpen}
+        onClose={handleCancelSave}
+        aria-labelledby="save-dialog-title"
+        aria-describedby="save-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: '#1F2A40',
+            color: 'white'
+          }
         }}
-        loading={loading || isExportingXLSX} // Update the loading prop
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        processRowUpdate={processRowUpdate}
-        editMode="row"
-        onRowEditStop={(params, event) => handleRowEditStop(params, event)}
-        onProcessRowUpdateError={handleProcessRowUpdateError} // Add this line
-      />
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={3000}
-        onClose={handleCloseNotification} // Use the defined handler
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={handleCloseNotification} severity={notification.severity} sx={{ width: '100%' }}>
-          {notification.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+        <DialogTitle id="save-dialog-title">
+          Confirm Save
+        </DialogTitle>
+        <DialogContent id="save-dialog-description">
+          Are you sure you want to save these changes?
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={handleCancelSave} 
+            sx={{ color: 'white' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmSave} 
+            variant="contained" 
+            sx={{ 
+              backgroundColor: '#3da58a',
+              '&:hover': {
+                backgroundColor: '#2e7c67'
+              }
+            }}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
