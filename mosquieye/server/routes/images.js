@@ -59,33 +59,50 @@ router.get('/:imageId', async (req, res) => {
   }
 });
 
-// Get all images with pagination
+// Get all images without pagination
 router.get('/', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
+    // Fetch all documents
     const images = await Image.find({})
-      .skip(skip)
-      .limit(limit)
       .select('-__v')
       .populate('uploadedBy', 'firstName lastName');
 
-    const total = await Image.countDocuments();
-
-    res.json({
-      images,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalImages: total
-    });
+    // Remove pagination info
+    res.json({ images });
   } catch (error) {
     console.error('Error fetching images:', error);
     res.status(500).json({ 
       message: 'Error fetching images', 
       error: error.message 
     });
+  }
+});
+
+// Update image by ID
+router.put('/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const { breteauIndex, moi, riskLevel, imageUrl, ...updateData } = req.body; // Exclude non-editable fields
+
+    console.log(`Received PUT request for imageId: ${imageId}`);
+    console.log('Update data:', updateData);
+
+    const updatedImage = await Image.findOneAndUpdate(
+      { imageId },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedImage) {
+      console.log(`Image with imageId ${imageId} not found.`);
+      return res.status(404).json({ message: 'Image not found' });
+    }
+
+    console.log(`Image with imageId ${imageId} updated successfully.`);
+    res.status(200).json({ image: updatedImage });
+  } catch (error) {
+    console.error('Error updating image:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
