@@ -12,7 +12,7 @@ router.get('/statistics', async (req, res) => {
     ]);
 
     const stats = {
-      activeOvitraps: ovitraps.filter(o => o.status === 'active').length,
+      activeOvitraps: ovitraps.filter(o => o.status === 'Active').length,
       totalEggs: images.reduce((sum, img) => sum + (img.analysisData?.totalEggs || 0), 0),
       riskAreas: ovitraps.filter(o => o.status === 'maintenance').length,
       avgEggsPerTrap: images.length ? Math.round(images.reduce((sum, img) => sum + (img.analysisData?.totalEggs || 0), 0) / ovitraps.length) : 0,
