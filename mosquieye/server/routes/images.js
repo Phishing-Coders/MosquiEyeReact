@@ -1,8 +1,108 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import Image from '../models/Images.js';
+import User from '../models/Users.js';
 
 const router = express.Router();
+
+// Important: Order matters - put specific routes before parametric routes
+router.get('/scan-by/users', async (req, res) => {
+  try {
+    // Get distinct scan_by values (clerk user IDs)
+    const distinctClerkIds = await Image.distinct('analysisData.scan_by');
+    
+    // Find users where clerkUserId matches scan_by values
+    const users = await User.find({
+      clerkUserId: { $in: distinctClerkIds.filter(id => id != null) }
+    }).select('firstName lastName clerkUserId');
+
+    // Format user data using clerkUserId as _id
+    const formattedUsers = users.map(user => ({
+      _id: user.clerkUserId, // Use clerkUserId instead of MongoDB _id
+      fullName: `${user.firstName} ${user.lastName}`
+    }));
+
+    console.log('Found users:', formattedUsers);
+    res.json({ users: formattedUsers });
+  } catch (error) {
+    console.error('Error fetching scan-by users:', error);
+    res.status(500).json({ 
+      message: 'Error fetching users', 
+      error: error.message,
+      stack: error.stack 
+    });
+  }
+});
+
+router.get('/stats/aggregate', async (req, res) => {
+  try {
+    const { timeFrame, months, year, scan_by } = req.query;
+    const selectedMonths = months ? months.split(',').map(Number) : [];
+    const selectedYear = parseInt(year) || new Date().getFullYear();
+    
+    let dateFormat = "%Y-%m-%d"; // default format
+    let dateMatch = {};
+    let startDate = new Date(selectedYear, 0, 1);
+    let endDate = new Date(selectedYear, 11, 31);
+
+    switch(timeFrame) {
+      case 'month':
+        const month = selectedMonths[0] || (new Date().getMonth() + 1);
+        startDate = new Date(selectedYear, month - 1, 1);
+        endDate = new Date(selectedYear, month, 0);
+        break;
+      case 'day':
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case 'week':
+        dateFormat = "%Y-%U";
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 28);
+        break;
+      // year is default
+    }
+    
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    
+    const matchQuery = {
+      createdAt: { $gte: startDate, $lte: endDate }
+    };
+
+    if (scan_by) {
+      matchQuery["analysisData.scan_by"] = scan_by; // Use clerkUserId directly
+    }
+
+    console.log('Query:', { timeFrame, startDate, endDate, scan_by, matchQuery });
+
+    const timeSeriesData = await Image.aggregate([
+      { $match: matchQuery },
+      {
+        $group: {
+          _id: { $dateToString: { format: dateFormat, date: "$createdAt" } },
+          singleEggs: { $avg: "$analysisData.singleEggs" },
+          clusteredEggs: { $avg: "$analysisData.clusteredEggs" },
+          totalEggs: { $avg: "$analysisData.totalEggs" },
+          clustersCount: { $avg: "$analysisData.clustersCount" },
+          avgEggsPerCluster: { $avg: "$analysisData.avgEggsPerCluster" },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    console.log('Results:', timeSeriesData);
+    res.json({ timeSeriesData });
+  } catch (error) {
+    console.error('Stats Error:', error);
+    res.status(500).json({ 
+      message: 'Error fetching statistics', 
+      error: error.message,
+      stack: error.stack 
+    });
+  }
+});
 
 // Post new image with analysis
 router.post('/', async (req, res) => {
@@ -43,7 +143,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get image by ID
+// Get image by ID - Move this AFTER the stats route
 router.get('/:imageId', async (req, res) => {
   try {
     const image = await Image.findOne({ imageId: req.params.imageId });
