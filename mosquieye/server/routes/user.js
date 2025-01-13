@@ -4,9 +4,10 @@ import User from '../models/Users.js';
 const router = express.Router();
 
 const ROLE_PERMISSIONS = {
-  "org:admin": ["dashboard", "team", "profile", "maps", "scan", "analysis", "settings"],
-  "org:health_office": ["dashboard", "profile", "analysis"],
-  "org:operations_team": ["dashboard", "scan"]
+  'org:admin': ['dashboard', 'team', 'profile', 'maps', 'scan', 'analysis', 'settings', 'contacts', 'qrscan', 
+    'calendar', 'geography', 'faq', 'bar', 'form', 'line', 'pie', 'ovitrap', 'analysisHistory'],
+  'org:operations_team': ['dashboard', 'team', 'profile', 'maps', 'scan', 'analysis', 'settings', 'contacts', 'qrscan', 
+    'calendar', 'geography', 'faq', 'bar', 'form', 'line', 'pie', 'ovitrap', 'analysisHistory']
 };
 
 // Get all users

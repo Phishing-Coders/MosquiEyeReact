@@ -24,7 +24,7 @@ export const renderEventContent = (eventInfo) => {
 const EventDialog = ({
   openDialog, handleCloseDialog, selectedEvent, isRange, setIsRange,
   formData, handleInputChange, handleFormSubmit, snackbar, handleSnackbarClose,
-  closeMorePopover, isFullDay, setIsFullDay, handleDelete
+  closeMorePopover, isFullDay, setIsFullDay, handleDelete, ovitraps
 }) => {
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
@@ -209,9 +209,11 @@ const EventDialog = ({
               onChange={handleInputChange}
               label="Ovitrap"
             >
-              <MenuItem value="Ovitrap 1">Ovitrap 1</MenuItem>
-              <MenuItem value="Ovitrap 2">Ovitrap 2</MenuItem>
-              <MenuItem value="Ovitrap 3">Ovitrap 3</MenuItem>
+              {ovitraps.map((ovitrap) => (
+                <MenuItem key={ovitrap.ovitrapId} value={ovitrap.ovitrapId}>
+                  {ovitrap.ovitrapId} - {ovitrap.metadata?.address || 'No address'}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <FormControl component="fieldset" sx={{ marginTop: '16px' }}>
