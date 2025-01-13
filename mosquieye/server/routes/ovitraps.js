@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
         ovitrapId,
         location,
         assignedUsers, // Clerk user IDs will work now
-        status: status || 'active',
+        status: status || 'Active',
         metadata,
         lastInspection: new Date(),
         nextInspection: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)

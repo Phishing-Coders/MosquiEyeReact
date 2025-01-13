@@ -1,6 +1,7 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import Image from '../models/Images.js';
+import Ovitrap from '../models/Ovitrap.js';
 import User from '../models/Users.js';
 
 const router = express.Router();
@@ -108,6 +109,17 @@ router.get('/stats/aggregate', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { imageData, analysisData } = req.body;
+    const parsedAnalysis = JSON.parse(analysisData);
+    
+    // Verify ovitrap exists
+    if (parsedAnalysis.ovitrap) {
+      const ovitrap = await Ovitrap.findOne({ ovitrapId: parsedAnalysis.ovitrap });
+      if (!ovitrap) {
+        return res.status(404).json({ 
+          message: 'Ovitrap not found' 
+        });
+      }
+    }
     
     // Remove the data:image/jpeg;base64 prefix
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
@@ -119,20 +131,29 @@ router.post('/', async (req, res) => {
     
     const newImage = new Image({
       imageId,
+      ovitrapId: parsedAnalysis.ovitrap, // Add ovitrap ID
       image: {
         data: buffer,
         contentType: 'image/jpeg'
       },
-      analysisData: JSON.parse(analysisData)
+      analysisData: parsedAnalysis
     });
 
     await newImage.save();
     console.log('Saved image to MongoDB:', imageId);
 
+    // Update ovitrap with new image reference
+    if (parsedAnalysis.ovitrap) {
+      await Ovitrap.findOneAndUpdate(
+        { ovitrapId: parsedAnalysis.ovitrap },
+        { $push: { images: newImage._id } }
+      );
+    }
+
     res.status(201).json({
       message: 'Image and analysis saved successfully',
       imageId,
-      image: newImage
+      ovitrapId: parsedAnalysis.ovitrap
     });
   } catch (error) {
     console.error('Error saving image:', error);
