@@ -484,29 +484,52 @@ const Scan = () => {
               </Card>
               {/* Analyze Button */}
               {imageSrc && (
-                <Box
-                  display="flex"
-                  justifyContent="center"
+                <>
+                <Box 
+                  display="flex" 
+                  justifyContent="center" 
                   mt={2}
                   sx={{
-                    position: "relative",
+                    position: 'relative',
                     zIndex: 1,
+                    marginBottom: '100px'
                   }}
                 >
-                  <Button
-                    color="primary"
-                    variant="contained"
+                  <Button 
+                    color="secondary" 
+                    variant="contained" 
                     onClick={() => handleToAnalysis({})}
                     size="large"
                     sx={{
-                      padding: "10px 30px",
-                      fontSize: "1.1rem",
+                      padding: '10px 30px',
+                      fontSize: '1.1rem',
                       fontWeight: "bold",
                     }}
                   >
                     Analyze Image
                   </Button>
                 </Box>
+                <Snackbar 
+                  open={showError} 
+                  autoHideDuration={3000} 
+                  onClose={() => setShowError(false)}
+                  anchorOrigin={{ 
+                    vertical: 'top', 
+                    horizontal: 'right' 
+                  }}
+                  sx={{
+                    marginTop: '20px',
+                    marginRight: '20px'
+                  }}
+                >
+                  <Alert 
+                    onClose={() => setShowError(false)} 
+                    severity="warning"
+                  >
+                    Please select an Ovitrap ID first
+                  </Alert>
+                </Snackbar>
+              </>
               )}
             </Grid>
           </Grid>
