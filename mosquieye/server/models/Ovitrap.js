@@ -24,15 +24,18 @@ const ovitrapSchema = new mongoose.Schema({
   }],
   status: {
     type: String,
-    enum: ['active', 'inactive', 'maintenance'],
-    default: 'active'
+    enum: ['Active', 'Inactive', 'Maintenance'],
+    default: 'Inactive'
   },
-  lastInspection: Date,
-  nextInspection: Date,
   metadata: {
     area: String,
     district: String,
     address: String
+  },
+  statistics: {
+    totalEggs: Number,
+    lastInspection: Date,
+    riskLevel: String
   }
 }, { timestamps: true });
 

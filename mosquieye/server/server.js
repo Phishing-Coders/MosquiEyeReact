@@ -9,6 +9,7 @@ import userRoutes from './routes/user.js';
 import imagesRoutes from './routes/images.js';
 import schedulesRouter from './routes/schedules.js';
 import ovitrapsRouter from './routes/ovitraps.js';
+import dashboardRouter from './routes/dashboard.js';
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ app.use((req, res, next) => {
 
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? ['https://your-frontend-domain.vercel.app']
+    ? ['https://mosquieye-prod.vercel.app/']
     : ['http://localhost:3000'],
   credentials: true
 }));
@@ -146,6 +147,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/images', imagesRoutes);
 app.use('/api/schedules', schedulesRouter);
 app.use('/api/ovitraps', ovitrapsRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 // Update MongoDB connection with retry logic
 const connectWithRetry = () => {

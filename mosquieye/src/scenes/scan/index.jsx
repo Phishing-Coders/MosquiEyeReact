@@ -7,20 +7,17 @@ import Header from "../../components/Header";
 import { PhotoCamera, Cancel } from "@mui/icons-material";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
+import { 
+  Box, Button, Container, Grid, Card, CardMedia, CardContent, 
+  Typography, FormControl, InputLabel, Select, MenuItem, Alert, Snackbar 
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 const Scan = () => {
   const isMobile = useMediaQuery("(min-width:600px)");
+  const location = useLocation();
+  const { ovitrapId, ovitrapData } = location.state || {};
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -31,11 +28,36 @@ const Scan = () => {
   const [showBottomOptions, setShowBottomOptions] = useState(false);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const bottomSectionRef = useRef(null); // Add this line
+  const bottomSectionRef = useRef(null);
+  const [ovitraps, setOvitraps] = useState([]);
+  const [selectedOvitrapId, setSelectedOvitrapId] = useState('');
+  const [showError, setShowError] = useState(false);
+  const [showImageOptions, setShowImageOptions] = useState(false);
+
+  const handleOvitrapSelect = (e) => {
+    setSelectedOvitrapId(e.target.value);
+    setShowImageOptions(!!e.target.value || !!ovitrapId);
+  };
 
   useEffect(() => {
-    setImageType("paper");
-  }, []);
+    const fetchOvitraps = async () => {
+      try {
+        const response = await axios.get('/api/ovitraps');
+        setOvitraps(response.data.ovitraps);
+        
+        // If ovitrapId exists from QR scan, set it as selected
+        if (ovitrapId) {
+          setSelectedOvitrapId(ovitrapId);
+          setShowImageOptions(true);
+        }
+      } catch (error) {
+        console.error('Error fetching ovitraps:', error);
+      }
+    };
+
+    fetchOvitraps();
+    setImageType('paper');
+  }, [ovitrapId]);
 
   const handleToggle = (type) => {
     setImageType(type);
@@ -126,13 +148,25 @@ const Scan = () => {
   };
 
   const handleToAnalysis = (values) => {
+    if (!selectedOvitrapId && !ovitrapId) {
+      setShowError(true);
+      return;
+    }
+    
     const formData = new FormData();
     formData.append("address2", values.address2);
     formData.append("picture", imageSrc);
 
-    navigate("/analysis", {
-      state: { imageData: imageSrc, imageType, ...values },
-    });
+    navigate('/analysis', { 
+      state: { 
+        imageData: imageSrc, 
+        imageType,
+        additionalData: {
+          ovitrapId: ovitrapId || selectedOvitrapId,
+          ...ovitrapData
+        },
+        ...values 
+      } }); 
   };
 
   const resetCroppa = () => {
@@ -175,14 +209,46 @@ const Scan = () => {
         title="Scan"
         subtitle="Upload Image to algorithmically detect mosquito eggs and egg cluster on ovitrap paper using computer vision."
       />
-      <Container
-        maxWidth="lg"
-        sx={{
-          mt: 0,
-          mb: isMobile ? 9 : 10,
-          px: isMobile ? 0 : 0, // Adjust padding for mobile
-        }}
-      >
+        <Container
+          maxWidth="lg"
+          sx={{
+            mt: 0,
+            mb: isMobile ? 9 : 10,
+            px: isMobile ? 0 : 0, // Adjust padding for mobile
+          }}
+        >
+        <Box mb={3}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Select Ovitrap</InputLabel>
+            <Select
+              value={selectedOvitrapId}
+              onChange={handleOvitrapSelect}
+              label="Select Ovitrap"
+              disabled={!!ovitrapId} // Disable if ovitrapId exists from QR scan
+            >
+              {ovitraps.map((ovitrap) => (
+                <MenuItem key={ovitrap.ovitrapId} value={ovitrap.ovitrapId}>
+                  {`Ovitrap ${ovitrap.ovitrapId} - ${ovitrap.metadata.area || 'No area'}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {ovitrapId && (
+            <Typography 
+              variant="caption" 
+              color="textSecondary" 
+              sx={{ display: 'block', mt: 1 }}
+            >
+              Ovitrap ID locked from QR scan
+            </Typography>
+          )}
+        </Box>
+
+        {showImageOptions && (
+          <>
+          
+          </>
+        )}
         <Grid container justifyContent="center" alignItems="center">
           <Grid item xs={12} md={9}>
             <Typography

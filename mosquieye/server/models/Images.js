@@ -4,8 +4,9 @@ const imageSchema = new mongoose.Schema({
   imageId: {
     type: String,
     required: true,
-    unique: true
+    unique: true // Ensure imageId is unique
   },
+  ovitrapId: String,
   image: {
     data: Buffer,
     contentType: String
@@ -22,7 +23,10 @@ const imageSchema = new mongoose.Schema({
     avgEggsPerCluster: Number,
     imageSize: String,
     scan_by: String,
-    ovitrap_type: String
+    ovitrap_type: String,
+    breteauIndex: Number,
+    ovitrapIndex: Number,
+    riskLevel: String
   },
   ovitrap: {
     type: mongoose.Schema.Types.ObjectId,

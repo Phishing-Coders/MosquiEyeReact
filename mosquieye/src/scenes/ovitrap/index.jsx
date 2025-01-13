@@ -96,7 +96,7 @@ const Ovitrap = () => {
       location: {
         coordinates: [103.6372, 1.5535]
       },
-      status: "active",
+      status: "Active",
       metadata: {
         area: "",
         district: "",
@@ -224,9 +224,9 @@ const Ovitrap = () => {
           display="flex"
           justifyContent="center"
           backgroundColor={
-            params.row.status === 'active'
+            params.row.status === 'Active'
               ? colors.greenAccent[600]
-              : params.row.status === 'maintenance'
+              : params.row.status === 'Maintenance'
               ? colors.blueAccent[700]
               : colors.redAccent[700]
           }
@@ -447,9 +447,9 @@ const Ovitrap = () => {
                   native: true,
                 }}
               >
-                <option value="active">Active</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="inactive">Inactive</option>
+                <option value="Active">Active</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Inactive">Inactive</option>
               </TextField>
             </Box>
           </DialogContent>

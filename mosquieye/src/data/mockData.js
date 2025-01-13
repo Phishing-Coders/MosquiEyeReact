@@ -406,10 +406,6 @@ export const mockLineData = [
     color: tokens("dark").greenAccent[500],
     data: [
       {
-        x: "Sunday",
-        y: 3000,
-      },
-      {
         x: "Monday",
         y: 4400,
       },
@@ -433,7 +429,10 @@ export const mockLineData = [
         x: "Saturday",
         y: 8100,
       },
-      
+      {
+        x: "Sunday",
+        y: 3000,
+      },
     ],
   },
  
