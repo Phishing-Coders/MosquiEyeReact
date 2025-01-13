@@ -217,9 +217,18 @@ const Scan = () => {
             px: isMobile ? 0 : 0, // Adjust padding for mobile
           }}
         >
-        <Box mb={3}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Select Ovitrap</InputLabel>
+        <Box mb={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <FormControl fullWidth variant="outlined"
+            sx={{ 
+              width: '30%',
+            }}>
+            <InputLabel 
+            sx={{ 
+              fontSize: '1.0rem',
+              fontWeight: 'bold',
+              justifyContent: 'center',
+            }}
+            >Select Ovitrap</InputLabel>
             <Select
               value={selectedOvitrapId}
               onChange={handleOvitrapSelect}

@@ -249,7 +249,15 @@ const AnalysisHistoryTable = ({
         <img
           src={params.value || 'https://via.placeholder.com/80?text=No+Image'}
           alt="Analysis result"
-          style={{ width: '80px', cursor: 'pointer' }}
+          style={{ 
+            height: '50px',
+            width: '50px',
+            objectFit: 'contain',
+            cursor: 'pointer',
+            display: 'block',
+            margin: 'auto',
+            marginTop: '5px'
+          }}
           onClick={() => {
             // Implement image selection if needed
           }}
@@ -482,8 +490,8 @@ const AnalysisHistoryTable = ({
 
   return (
     <>
-      <Box style={{ height: 600, width: '100%', marginBottom: '6rem' }}>  {/* Add marginBottom here */}
-        <DataGrid
+      <Box style={{ height: 720, width: '100%', marginBottom: '6rem'}}>  {/* Add marginBottom here */}
+        <DataGrid  // Set text color to white
           apiRef={apiRef} // Pass apiRef to the DataGrid
           rows={rows}
           columns={editableColumns} // Use the updated columns
@@ -521,6 +529,19 @@ const AnalysisHistoryTable = ({
           editMode="row"
           onRowEditStop={handleRowEditStop}
           onProcessRowUpdateError={handleProcessRowUpdateError} // Add this line
+          sx={{
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#333', // Adjust header background color if needed
+              color: 'white', // Header text color
+              fontWeight: 'bold', // Make header text bold
+              fontSize: '1rem', // Adjust header text size if needed
+            },
+            '& .MuiDataGrid-cell': {
+              color: 'white', // Header text color
+              //fontWeight: 'bold', // Make header text bold
+              fontSize: '14px', // Adjust header text size if needed
+            }
+          }}
         />
         <Snackbar
           open={notification.open}
