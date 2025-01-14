@@ -79,11 +79,11 @@ MosquiEye is an AI-powered application aimed at monitoring and counting mosquito
 5. **User Profile Management**: Manage user profiles and role-based access for officers.
 
 ## Team
-- Project Manager & AI Specialist: *Your Name*
-- Full Stack Developer: *Team Member 1*
-- DevOps Engineer: *Team Member 2*
-- UI/UX Designer: *Team Member 3*
-- QA Engineer: *Team Member 4*
+- Project Manager & AI Specialist: *Ahmad Nabil*
+- Full Stack Developer: *Hanif & Tan Woon Zhe*
+- DevOps Engineer: *Ahmad Nabil*
+- UI/UX Designer: *Eizkhan*
+- QA Engineer: *Aqmar Ilhan*
 
 ## Contributing
 1. Fork the repository.
