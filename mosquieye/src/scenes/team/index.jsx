@@ -61,9 +61,9 @@ const Team = () => {
         const accessLabel = access === 'org:admin' ? 'Admin' : 'Operations Team';
         return (
           <Box
-            width="60%"
-            m="0 auto"
-            p="5px"
+            width="50%"
+            m="4px auto"
+            p="10px"
             display="flex"
             justifyContent="center"
             backgroundColor={
@@ -88,11 +88,12 @@ const Team = () => {
       <Header title="TEAM" subtitle="Managing the Team Members" />
       <OrganizationSwitcher />
       <Box
-        m="40px 0 0 0"
+        m="20px 0 0 0"
         height="75vh"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
+            fontSize: "15px",
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",

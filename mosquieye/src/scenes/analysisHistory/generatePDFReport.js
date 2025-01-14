@@ -9,17 +9,15 @@ const generatePDFReport = async (displayedRows, users, logoImage) => {
   }, {});
 
   try {
-    // 2. Filter out columns you don’t need (e.g. 'image')
+    // 1. Include 'id' and 'ovitrapId' for the table, exclude 'breteauIndex', 'moi', and 'riskLevel'
     const allVisibleColumns = [
       'expand',
+      'ovitrapId',
       'imageUrl',
       'imageType',
       'totalEggs',
       'singleEggs',
       'clusterEggs',
-      'breteauIndex',
-      'moi',
-      'riskLevel',
       'date',
       'scanBy',
       'singlesTotalArea',
@@ -31,7 +29,19 @@ const generatePDFReport = async (displayedRows, users, logoImage) => {
       'affectedAreaClusters'
     ];
     const pdfColumns = allVisibleColumns.filter((field) => field !== 'imageUrl'); // Exclude imageUrl
-    const tableHeaders = pdfColumns.map((field) => field.replace(/([A-Z])/g, ' $1').trim());
+    const tableHeaders = pdfColumns.map((field) => {
+      // Hide header for 'expand' column
+      if (field === 'expand') return '';
+      
+      // Capitalize first letter of each word
+      return field
+        .replace(/([A-Z])/g, ' $1')
+        .trim()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    });
+
     const tableFields = pdfColumns;
 
     const doc = new jsPDF({ orientation: 'landscape' });
@@ -170,14 +180,65 @@ const generatePDFReport = async (displayedRows, users, logoImage) => {
       doc.text(`No. ${i + 1}`, 14, 20);
       doc.text(`Analysis ID: ${analysisId}`, 14, 30);
 
-      // Use row.analysisData instead of analysis.analysisData
-      const fields = Object.entries(row.analysisData || {});
-      const extraData = fields.map(([key, value]) => [key, String(value)]);
+      // 2. In the detail part, define a custom sorting for fields, excluding BI, MOI, riskLevel
+      // Set up a sorted list of fields we want, in desired order
+      const sortedFields = [
+        'Date',
+        'Ovitrap ID',
+        'Image Type',
+        'Scan By',
+        'Single Eggs',
+        'Cluster Eggs',
+        'Total Eggs',
+        'Singles Total Area',
+        'Singles Average Size',
+        'Clusters Total Area',
+        'Average Cluster Area',
+        'Average Eggs Per Cluster',
+        'Affected Area (Singles)',
+        'Affected Area (Clusters)'
+      ];
+
+      // Build detailData based on that order
+      const detailData = [];
+      for (const label of sortedFields) {
+        let value = '';
+        let key = label.toLowerCase().replace(/\s|\(|\)/g, ''); // e.g. "Date" -> "date"
+
+        // Adjust key to match row / analysisData if needed
+        if (label === 'Date') {
+          value = new Date(row.date).toLocaleDateString();
+        } else if (label === 'Scan By') {
+          const clerkId = row.analysisData?.scan_by;
+          value = clerkId ? (userMap[clerkId] || clerkId) : row.scanBy;
+        } else if (label === 'Ovitrap ID') {
+          value = row.ovitrapId || 'N/A';
+        } else if (label === 'Image Type') {
+          value = row.imageType || '';
+        } else {
+          // Map possible analysisData fields
+          const dataMap = {
+            singleeggs: row.singleEggs?.toString() || row.analysisData?.singleEggs?.toString() || "0",
+            clustereggs: row.clusterEggs?.toString() || row.analysisData?.clusterEggs?.toString() || "0",
+            totaleggs: row.totalEggs?.toString() || row.analysisData?.totalEggs?.toString() || "0",
+            singlestotalarea: `${row.singlesTotalArea?.toFixed(2) || 0} `,
+            singlesaveragesize: `${row.singlesAvg?.toFixed(2) || 0} `,
+            clusterscount: row.clusterEggs?.toString() || row.analysisData?.clustersCount?.toString() || "0",
+            clusterstotalarea: `${row.clustersTotalArea?.toFixed(2) || 0} `,
+            averageclusterarea: `${row.avgClusterArea?.toFixed(2) || 0} `,
+            averageeggspercluster: row.avgEggsPerCluster?.toFixed(2) || "0",
+            affectedareasingles: `${(row.singlesTotalArea / (row.singleEggs || 1)).toFixed(2)} px²`,
+            affectedareaclusters: `${(row.clustersTotalArea / (row.clusterEggs || 1)).toFixed(2)} px²`
+          };
+          value = dataMap[key] || "0"; // Default to "0" instead of empty string
+        }
+        detailData.push([label, value]);
+      }
 
       doc.autoTable({
         startY: 40,
         head: [['Field', 'Value']],
-        body: extraData,
+        body: detailData,
         theme: 'striped',
         styles: { fontSize: 8 },
         headStyles: { fillColor: [39, 174, 96] }

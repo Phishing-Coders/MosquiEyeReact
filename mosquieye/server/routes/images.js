@@ -2,57 +2,168 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import Image from '../models/Images.js';
 import Ovitrap from '../models/Ovitrap.js';
+import User from '../models/Users.js';
 
 const router = express.Router();
+
+// Important: Order matters - put specific routes before parametric routes
+router.get('/scan-by/users', async (req, res) => {
+  try {
+    // Get distinct scan_by values (clerk user IDs)
+    const distinctClerkIds = await Image.distinct('analysisData.scan_by');
+    
+    // Find users where clerkUserId matches scan_by values
+    const users = await User.find({
+      clerkUserId: { $in: distinctClerkIds.filter(id => id != null) }
+    }).select('firstName lastName clerkUserId');
+
+    // Format user data using clerkUserId as _id
+    const formattedUsers = users.map(user => ({
+      _id: user.clerkUserId, // Use clerkUserId instead of MongoDB _id
+      fullName: `${user.firstName} ${user.lastName}`
+    }));
+
+    console.log('Found users:', formattedUsers);
+    res.json({ users: formattedUsers });
+  } catch (error) {
+    console.error('Error fetching scan-by users:', error);
+    res.status(500).json({ 
+      message: 'Error fetching users', 
+      error: error.message,
+      stack: error.stack 
+    });
+  }
+});
+
+router.get('/stats/aggregate', async (req, res) => {
+  try {
+    const { startDate, endDate, scan_by, groupBy } = req.query;
+    
+    // Parse dates and adjust for timezone
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const matchQuery = {
+      createdAt: {
+        $gte: start,
+        $lte: end
+      }
+    };
+
+    console.log('Date range:', { 
+      start: start.toISOString(), 
+      end: end.toISOString() 
+    });
+
+    if (scan_by) {
+      matchQuery["analysisData.scan_by"] = scan_by;
+    }
+
+    console.log('Query:', { startDate, endDate, scan_by, matchQuery });
+
+    // Decide grouping field
+    let groupField = {
+      $dateToString: { 
+        format: "%Y-%m-%d", 
+        date: "$createdAt" 
+      }
+    };
+
+    if (groupBy === "ovitrap") {
+      groupField = "$ovitrapId";
+    } else if (groupBy === "type") {
+      groupField = "$analysisData.ovitrap_type";
+    } else if (groupBy === "scan_by") {
+      groupField = "$analysisData.scan_by";
+    }
+
+    const timeSeriesData = await Image.aggregate([
+      { $match: matchQuery },
+      {
+        $group: {
+          _id: groupField,
+          singleEggs: { $avg: "$analysisData.singleEggs" },
+          clusteredEggs: { $avg: "$analysisData.clusteredEggs" },
+          totalEggs: { $avg: "$analysisData.totalEggs" },
+          clustersCount: { $avg: "$analysisData.clustersCount" },
+          avgEggsPerCluster: { $avg: "$analysisData.avgEggsPerCluster" },
+          singlesTotalArea: { $avg: "$analysisData.singlesTotalArea" },
+          singlesAvg: { $avg: "$analysisData.singlesAvg" },
+          clustersTotalArea: { $avg: "$analysisData.clustersTotalArea" },
+          avgClusterArea: { $avg: "$analysisData.avgClusterArea" },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    // Rename _id to dimensionValue
+    const formattedData = timeSeriesData.map(item => ({
+      dimensionValue: item._id,
+      ...item,
+      _id: undefined
+    }));
+
+    console.log('Results:', formattedData);
+    res.json({ timeSeriesData: formattedData });
+  } catch (error) {
+    console.error('Stats Error:', error);
+    res.status(500).json({ 
+      message: 'Error fetching statistics', 
+      error: error.message,
+      stack: error.stack 
+    });
+  }
+});
 
 // Post new image with analysis
 router.post('/', async (req, res) => {
   try {
     const { imageData, analysisData } = req.body;
-    const parsedAnalysis = JSON.parse(analysisData);
-
-    const now = new Date();
-    const malaysiaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
-    const isoDate = malaysiaTime.toISOString();
     
-    // Verify ovitrap exists
-    if (parsedAnalysis.ovitrap) {
-      const ovitrap = await Ovitrap.findOne({ ovitrapId: parsedAnalysis.ovitrap });
-      if (!ovitrap) {
-        return res.status(404).json({ 
-          message: 'Ovitrap not found' 
-        });
-      }
+    if (!imageData) {
+      return res.status(400).json({ message: 'Image data is required' });
     }
-    
-    // Remove the data:image/jpeg;base64 prefix
+
+    let parsedAnalysis;
+    try {
+      parsedAnalysis = JSON.parse(analysisData);
+    } catch (error) {
+      return res.status(400).json({ message: 'Invalid analysis data format' });
+    }
+
+    // Remove the data:image/jpeg;base64 prefix and create buffer
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
-    
-    // Create buffer from base64
     const buffer = Buffer.from(base64Data, 'base64');
     
     const imageId = uuidv4();
     
     const newImage = new Image({
       imageId,
-      ovitrapId: parsedAnalysis.ovitrap, // Add ovitrap ID
+      ovitrapId: parsedAnalysis.ovitrap,
       image: {
         data: buffer,
         contentType: 'image/jpeg'
       },
-      analysisData: parsedAnalysis,
-      createdAt: isoDate
+      analysisData: {
+        ...parsedAnalysis,
+        scan_by: parsedAnalysis.scan_by // Store Clerk user ID as string
+      }
     });
 
     await newImage.save();
-    console.log('Saved image to MongoDB:', imageId);
-
-    // Update ovitrap with new image reference
+    
+    // Update ovitrap if ID exists
     if (parsedAnalysis.ovitrap) {
-      await Ovitrap.findOneAndUpdate(
-        { ovitrapId: parsedAnalysis.ovitrap },
-        { $push: { images: newImage._id } }
-      );
+      try {
+        await Ovitrap.findOneAndUpdate(
+          { ovitrapId: parsedAnalysis.ovitrap },
+          { $push: { images: newImage._id } }
+        );
+      } catch (error) {
+        console.warn('Error updating ovitrap:', error);
+        // Continue even if ovitrap update fails
+      }
     }
 
     res.status(201).json({
@@ -61,15 +172,16 @@ router.post('/', async (req, res) => {
       ovitrapId: parsedAnalysis.ovitrap
     });
   } catch (error) {
-    console.error('Error saving image:', error);
+    console.error('Server error saving image:', error);
     res.status(500).json({ 
       message: 'Error saving image and analysis', 
-      error: error.message 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
 
-// Get image by ID
+// Get image by ID - Move this AFTER the stats route
 router.get('/:imageId', async (req, res) => {
   try {
     const image = await Image.findOne({ imageId: req.params.imageId });
