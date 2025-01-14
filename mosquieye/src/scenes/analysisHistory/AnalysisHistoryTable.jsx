@@ -295,9 +295,9 @@ const AnalysisHistoryTable = ({
           src={params.value || 'https://via.placeholder.com/80?text=No+Image'}
           alt="Analysis result"
           style={{ 
-            height: '50px',
-            width: '50px', height: '80px', objectFit: 'cover',
-            objectFit: 'contain',
+            width: '50px', 
+            height: '50px', 
+            objectFit: 'cover',
             cursor: 'pointer',
             display: 'block',
             margin: 'auto',
