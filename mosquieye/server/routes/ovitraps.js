@@ -39,26 +39,17 @@ router.post('/', async (req, res) => {
     }
   });
 
-// Get all ovitraps with pagination
+// Get all ovitraps
 router.get('/', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
+    // Remove pagination and fetch all ovitraps
     const ovitraps = await Ovitrap.find({})
-      .skip(skip)
-      .limit(limit)
       .populate('assignedUsers', 'firstName lastName email')
       .populate('images')
       .select('-__v');
 
-    const total = await Ovitrap.countDocuments();
-
     res.json({
       ovitraps,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
       totalOvitraps: ovitraps.length
     });
   } catch (error) {
