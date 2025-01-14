@@ -7,6 +7,7 @@ const Bar = () => {
     <Box 
       m="20px"
       display="flex"
+      marginBottom={50}
       flexDirection="column"
       sx={{ 
         height: "100%",

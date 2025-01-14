@@ -2,18 +2,21 @@ import { Box, FormControl, InputLabel, MenuItem, Select, Chip } from '@mui/mater
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import { useState, useEffect } from 'react';
+import DateRangePicker from './DateRangePicker';
 
 const ChartControls = ({ 
-  timeFrame, 
-  setTimeFrame, 
   selectedMetrics, 
-  setSelectedMetrics, 
-  selectedMonths, 
-  setSelectedMonths,
-  selectedYear,
-  setSelectedYear,
+  setSelectedMetrics,
   scanBy,
-  setScanBy 
+  setScanBy,
+  groupBy,
+  setGroupBy,
+  metrics,
+  initialDateRange,
+  onDateChange,
+  category,
+  setCategory,
+  categoryOptions = [] // Add default empty array
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -40,23 +43,6 @@ const ChartControls = ({
     { value: 12, label: 'December' },
   ];
 
-  // Set all months as selected by default when timeFrame changes to 'year'
-  useEffect(() => {
-    if (timeFrame === 'year') {
-      setSelectedMonths(months.map(m => m.value));
-    } else {
-      setSelectedMonths([new Date().getMonth() + 1]); // Current month for 'month' view
-    }
-  }, [timeFrame]);
-
-  const metrics = [
-    { value: 'singleEggs', label: 'Single Eggs (avg)' },
-    { value: 'clusteredEggs', label: 'Clustered Eggs (avg)' },
-    { value: 'totalEggs', label: 'Total Eggs (avg)' },
-    { value: 'clustersCount', label: 'Clusters Count (avg)' },
-    { value: 'avgEggsPerCluster', label: 'Avg Eggs per Cluster' },
-  ];
-
   // Add useEffect to fetch scan-by users
   useEffect(() => {
     const fetchScanByUsers = async () => {
@@ -71,152 +57,196 @@ const ChartControls = ({
     fetchScanByUsers();
   }, []);
 
+  // Common styles for Select components
+  const selectStyles = {
+    color: colors.grey[100],
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: colors.grey[100]
+    },
+    '& .MuiSelect-select': {
+      color: colors.grey[100]
+    },
+    '& .MuiMenuItem-root': {
+      '&.Mui-selected': {
+        backgroundColor: `${colors.primary[400]} !important`,
+        color: colors.grey[100]
+      },
+      '&:hover': {
+        backgroundColor: colors.primary[500]
+      }
+    }
+  };
+
+  // Common styles for MenuItems
+  const menuItemStyles = {
+    color: colors.grey[100],
+    '&.Mui-selected': {
+      backgroundColor: colors.primary[400],
+      '&:hover': {
+        backgroundColor: colors.primary[500]
+      }
+    },
+    '&:hover': {
+      backgroundColor: colors.primary[500]
+    }
+  };
+
   return (
-    <Box display="flex" gap={2} mb={2}>
-      <FormControl sx={{ minWidth: 120 }}>
-        <InputLabel sx={{ color: colors.grey[100] }}>Time Frame</InputLabel>
-        <Select
-          value={timeFrame}
-          onChange={(e) => setTimeFrame(e.target.value)}
-          label="Time Frame"
-          sx={{
-            color: colors.grey[100],
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: colors.grey[100]
-            }
-          }}
-        >
-          <MenuItem value="day">Day</MenuItem>
-          <MenuItem value="week">Week</MenuItem>
-          <MenuItem value="month">Month</MenuItem>
-          <MenuItem value="year">Year</MenuItem>
-        </Select>
-      </FormControl>
+    <Box>
+      {/* Top row with date picker */}
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <DateRangePicker 
+          onDateChange={onDateChange} 
+          initialDateRange={initialDateRange}
+        />
+      </Box>
 
-      <FormControl sx={{ minWidth: 120 }}>
-        <InputLabel sx={{ color: colors.grey[100] }}>Year</InputLabel>
-        <Select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          label="Year"
-          sx={{
-            color: colors.grey[100],
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: colors.grey[100]
-            }
-          }}
-        >
-          {years.map((year) => (
-            <MenuItem key={year} value={year}>
-              {year}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      {/* Bottom row with other controls */}
+      <Box display="flex" gap={2} mb={2}>
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel sx={{ color: colors.grey[100] }}>Group By</InputLabel>
+          <Select
+            value={groupBy}
+            onChange={(e) => setGroupBy(e.target.value || 'date')} // If blank, default to 'date'
+            label="Group By"
+            sx={selectStyles}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  bgcolor: colors.primary[400],
+                  '& .MuiMenuItem-root': menuItemStyles
+                }
+              }
+            }}
+          >
+            <MenuItem value="">(No grouping)</MenuItem>
+            <MenuItem value="ovitrap">Ovitrap ID</MenuItem>
+            <MenuItem value="type">Image Type</MenuItem>
+            <MenuItem value="scan_by">Scan By</MenuItem>
+          </Select>
+        </FormControl>
 
-      <FormControl sx={{ minWidth: 200 }}>
-        <InputLabel sx={{ color: colors.grey[100] }}>
-          {timeFrame === 'year' ? 'Select Months' : 'Select Month'}
-        </InputLabel>
-        <Select
-          multiple={timeFrame === 'year'}
-          value={selectedMonths}
-          onChange={(e) => setSelectedMonths(timeFrame === 'year' ? e.target.value : [e.target.value])}
-          label={timeFrame === 'year' ? 'Select Months' : 'Select Month'}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {Array.isArray(selected) ? selected.map((value) => (
-                <Chip 
-                  key={value} 
-                  label={months.find(m => m.value === value)?.label} 
-                  sx={{ 
-                    color: colors.grey[100],
-                    backgroundColor: colors.primary[400]
-                  }}
-                />
-              )) : (
-                <Chip 
-                  label={months.find(m => m.value === selected)?.label}
-                  sx={{ 
-                    color: colors.grey[100],
-                    backgroundColor: colors.primary[400]
-                  }}
-                />
-              )}
-            </Box>
-          )}
-          sx={{
-            color: colors.grey[100],
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: colors.grey[100]
-            }
-          }}
-        >
-          {months.map((month) => (
-            <MenuItem key={month.value} value={month.value}>
-              {month.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel sx={{ color: colors.grey[100] }}>Metrics</InputLabel>
+          <Select
+            multiple
+            value={selectedMetrics}
+            onChange={(e) => setSelectedMetrics(e.target.value)}
+            label="Metrics"
+            renderValue={(selected) => (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip 
+                    key={value} 
+                    label={metrics.find(m => m.value === value)?.label} 
+                    sx={{ 
+                      color: colors.grey[100],
+                      backgroundColor: colors.primary[400]
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+            sx={selectStyles}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  bgcolor: colors.primary[400],
+                  '& .MuiMenuItem-root': menuItemStyles
+                }
+              }
+            }}
+          >
+            {metrics.map((metric) => (
+              <MenuItem 
+                key={metric.value} 
+                value={metric.value}
+                sx={menuItemStyles}
+              >
+                {metric.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-      <FormControl sx={{ minWidth: 200 }}>
-        <InputLabel sx={{ color: colors.grey[100] }}>Metrics</InputLabel>
-        <Select
-          multiple
-          value={selectedMetrics}
-          onChange={(e) => setSelectedMetrics(e.target.value)}
-          label="Metrics"
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip 
-                  key={value} 
-                  label={metrics.find(m => m.value === value)?.label} 
-                  sx={{ 
-                    color: colors.grey[100],
-                    backgroundColor: colors.primary[400]
-                  }}
-                />
+        {groupBy !== 'scan_by' && (
+          <FormControl sx={{ minWidth: 150 }}>
+            <InputLabel sx={{ color: colors.grey[100] }}>Scan By</InputLabel>
+            <Select
+              value={scanBy}
+              onChange={(e) => setScanBy(e.target.value)}
+              label="Scan By"
+              sx={selectStyles}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    bgcolor: colors.primary[400],
+                    '& .MuiMenuItem-root': menuItemStyles
+                  }
+                }
+              }}
+            >
+              <MenuItem value="">(All)</MenuItem>
+              {scanByUsers.map((user) => (
+                <MenuItem key={user._id} value={user._id}>
+                  {user.fullName}
+                </MenuItem>
               ))}
-            </Box>
-          )}
-          sx={{
-            color: colors.grey[100],
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: colors.grey[100]
-            }
-          }}
-        >
-          {metrics.map((metric) => (
-            <MenuItem key={metric.value} value={metric.value}>
-              {metric.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+            </Select>
+          </FormControl>
+        )}
 
-      <FormControl sx={{ minWidth: 150 }}>
-        <InputLabel sx={{ color: colors.grey[100] }}>Scan By</InputLabel>
-        <Select
-          value={scanBy}
-          onChange={(e) => setScanBy(e.target.value)}
-          label="Scan By"
-          sx={{
-            color: colors.grey[100],
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: colors.grey[100]
-            }
-          }}
-        >
-          <MenuItem value="">(All)</MenuItem>
-          {scanByUsers.map((user) => (
-            <MenuItem key={user._id} value={user._id}>
-              {user.fullName}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        {/* Only render category selection if categoryOptions is provided */}
+        {categoryOptions.length > 0 && (
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel sx={{ color: colors.grey[100] }}>Category</InputLabel>
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              label="Category"
+              sx={selectStyles}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    bgcolor: colors.primary[400],
+                    '& .MuiMenuItem-root': menuItemStyles
+                  }
+                }
+              }}
+            >
+              {categoryOptions.map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel sx={{ color: colors.grey[100] }}>Value Type</InputLabel>
+          <Select
+            value={selectedMetrics[0]} // Pie chart only uses one metric
+            onChange={(e) => setSelectedMetrics([e.target.value])}
+            label="Value Type"
+            sx={selectStyles}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  bgcolor: colors.primary[400],
+                  '& .MuiMenuItem-root': menuItemStyles
+                }
+              }
+            }}
+          >
+            {metrics.map(metric => (
+              <MenuItem key={metric.value} value={metric.value}>
+                {metric.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
     </Box>
   );
 };

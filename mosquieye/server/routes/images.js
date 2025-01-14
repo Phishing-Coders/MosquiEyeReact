@@ -37,64 +37,75 @@ router.get('/scan-by/users', async (req, res) => {
 
 router.get('/stats/aggregate', async (req, res) => {
   try {
-    const { timeFrame, months, year, scan_by } = req.query;
-    const selectedMonths = months ? months.split(',').map(Number) : [];
-    const selectedYear = parseInt(year) || new Date().getFullYear();
+    const { startDate, endDate, scan_by, groupBy } = req.query;
     
-    let dateFormat = "%Y-%m-%d"; // default format
-    let dateMatch = {};
-    let startDate = new Date(selectedYear, 0, 1);
-    let endDate = new Date(selectedYear, 11, 31);
+    // Parse dates and adjust for timezone
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    switch(timeFrame) {
-      case 'month':
-        const month = selectedMonths[0] || (new Date().getMonth() + 1);
-        startDate = new Date(selectedYear, month - 1, 1);
-        endDate = new Date(selectedYear, month, 0);
-        break;
-      case 'day':
-        startDate = new Date();
-        startDate.setDate(startDate.getDate() - 7);
-        break;
-      case 'week':
-        dateFormat = "%Y-%U";
-        startDate = new Date();
-        startDate.setDate(startDate.getDate() - 28);
-        break;
-      // year is default
-    }
-    
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
-    
     const matchQuery = {
-      createdAt: { $gte: startDate, $lte: endDate }
+      createdAt: {
+        $gte: start,
+        $lte: end
+      }
     };
 
+    console.log('Date range:', { 
+      start: start.toISOString(), 
+      end: end.toISOString() 
+    });
+
     if (scan_by) {
-      matchQuery["analysisData.scan_by"] = scan_by; // Use clerkUserId directly
+      matchQuery["analysisData.scan_by"] = scan_by;
     }
 
-    console.log('Query:', { timeFrame, startDate, endDate, scan_by, matchQuery });
+    console.log('Query:', { startDate, endDate, scan_by, matchQuery });
+
+    // Decide grouping field
+    let groupField = {
+      $dateToString: { 
+        format: "%Y-%m-%d", 
+        date: "$createdAt" 
+      }
+    };
+
+    if (groupBy === "ovitrap") {
+      groupField = "$ovitrapId";
+    } else if (groupBy === "type") {
+      groupField = "$analysisData.ovitrap_type";
+    } else if (groupBy === "scan_by") {
+      groupField = "$analysisData.scan_by";
+    }
 
     const timeSeriesData = await Image.aggregate([
       { $match: matchQuery },
       {
         $group: {
-          _id: { $dateToString: { format: dateFormat, date: "$createdAt" } },
+          _id: groupField,
           singleEggs: { $avg: "$analysisData.singleEggs" },
           clusteredEggs: { $avg: "$analysisData.clusteredEggs" },
           totalEggs: { $avg: "$analysisData.totalEggs" },
           clustersCount: { $avg: "$analysisData.clustersCount" },
           avgEggsPerCluster: { $avg: "$analysisData.avgEggsPerCluster" },
+          singlesTotalArea: { $avg: "$analysisData.singlesTotalArea" },
+          singlesAvg: { $avg: "$analysisData.singlesAvg" },
+          clustersTotalArea: { $avg: "$analysisData.clustersTotalArea" },
+          avgClusterArea: { $avg: "$analysisData.avgClusterArea" },
           count: { $sum: 1 }
         }
       },
       { $sort: { "_id": 1 } }
     ]);
 
-    console.log('Results:', timeSeriesData);
-    res.json({ timeSeriesData });
+    // Rename _id to dimensionValue
+    const formattedData = timeSeriesData.map(item => ({
+      dimensionValue: item._id,
+      ...item,
+      _id: undefined
+    }));
+
+    console.log('Results:', formattedData);
+    res.json({ timeSeriesData: formattedData });
   } catch (error) {
     console.error('Stats Error:', error);
     res.status(500).json({ 
