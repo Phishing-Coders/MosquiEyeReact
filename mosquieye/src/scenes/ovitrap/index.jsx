@@ -203,11 +203,26 @@ const Ovitrap = () => {
       headerName: "Location", 
       flex: 2,
       renderCell: (params) => (
-        <Box>
-          <Typography variant="body2">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <Typography 
+            variant="body2"
+            sx={{ 
+              fontWeight: "bold",
+              fontSize: "14px",
+              lineHeight: 1.6
+            }}
+          >
             {params.row.metadata.address || 'No address'}
           </Typography>
-          <Typography variant="caption" color="textSecondary">
+          <Typography 
+            variant="caption" 
+            color="textSecondary"
+            sx={{ 
+              fontSize: "14px",
+              lineHeight: 2,
+              mt: '0px'
+            }}
+          >
             {`${params.row.location.coordinates[1].toFixed(6)}, ${params.row.location.coordinates[0].toFixed(6)}`}
           </Typography>
         </Box>
@@ -219,10 +234,12 @@ const Ovitrap = () => {
       flex: 1,
       renderCell: (params) => (
         <Box
-          width="120px"
-          p="5px"
+          width="70px"
+          height="35px"
+          p="0px"
           display="flex"
           justifyContent="center"
+          alignItems="center"
           backgroundColor={
             params.row.status === 'Active'
               ? colors.greenAccent[600]
@@ -230,7 +247,11 @@ const Ovitrap = () => {
               ? colors.blueAccent[700]
               : colors.redAccent[700]
           }
-          borderRadius="4px"
+          borderRadius="5px"
+          sx={{ 
+            marginTop: 1, 
+            fontSize: "16px",
+          }}
         >
           {params.row.status}
         </Box>
@@ -245,7 +266,7 @@ const Ovitrap = () => {
           <Button
             variant="contained"
             color="primary"
-            size="small"
+            size="medium"
             onClick={() => handleEditClick(params.row)}
             sx={{ marginRight: 1 }}
           >
@@ -254,16 +275,16 @@ const Ovitrap = () => {
           <Button
             variant="contained"
             color="error"
-            size="small"
+            size="medium"
             onClick={() => handleDelete(params.row.ovitrapId)}
-            sx={{ marginRight: 1 }}
+            sx={{ marginRight: 1, marginTop: 0 }}
           >
             Delete
           </Button>
           <Button
             variant="contained"
             color="secondary"
-            size="small"
+            size="medium"
             onClick={() => setQrDialog({ open: true, ovitrapId: params.row.ovitrapId })}
           >
             Generate QR
@@ -286,6 +307,9 @@ const Ovitrap = () => {
           onClick={handleCreateClick}
           color="secondary"
           variant="contained"
+          sx={{
+            fontWeight: "bold"
+          }}
         >
           Add New Ovitrap
         </Button>
@@ -298,10 +322,11 @@ const Ovitrap = () => {
     ) : (
       <Box
         m="40px 0 0 0"
-        height="75vh"
+        height="73vh"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
+            fontSize: "15px"
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
@@ -312,6 +337,8 @@ const Ovitrap = () => {
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
+            fontWeight: "bold",
+            fontSize: "15px"
           },
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: colors.primary[400],
