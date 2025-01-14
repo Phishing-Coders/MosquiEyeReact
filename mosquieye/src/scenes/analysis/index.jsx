@@ -469,37 +469,35 @@ const handleSubmit = async () => {
     }
 
     const analysisData = {
-      ovitrap: additionalData?.ovitrapId,
+      ovitrap: additionalData?.ovitrapId || null,
       singleEggs: singlesCount,
       clusteredEggs: parseInt(singlesCalculated),
       totalEggs: totalEggs,
-      singlesTotalArea: singlesTotalArea,
+      singlesTotalArea: parseFloat(singlesTotalArea),
       singlesAvg: parseFloat(singlesAvg),
       clustersCount: clustersCount,
-      clustersTotalArea: clustersTotalArea,
+      clustersTotalArea: parseFloat(clustersTotalArea),
       avgClusterArea: parseFloat(avgClusterArea),
       avgEggsPerCluster: parseFloat(avgEggsPerCluster),
       imageSize: imageSize,
-      scan_by: user?.id,
+      scan_by: user?.id || null, // Send as string, not ObjectId
       ovitrap_type: ovitrapType
     };
 
-    // Send to server in chunks if needed
+    // Send the request
     const response = await axios.post('/api/images', {
       imageData,
       analysisData: JSON.stringify(analysisData)
-    }, {
-      maxBodyLength: Infinity, // Remove axios size limit
-      maxContentLength: Infinity
     });
 
     console.log('Analysis saved:', response.data);
     alert('Analysis saved successfully!');
+    navigate('/dashboard'); // Optionally redirect after success
     
   } catch (error) {
-    console.error('Error submitting analysis:', error);
-    setSubmitError(error.message);
-    alert('Error saving analysis: ' + error.message);
+    console.error('Error details:', error.response?.data || error.message);
+    setSubmitError(error.response?.data?.message || error.message);
+    alert('Error saving analysis: ' + (error.response?.data?.message || error.message));
   } finally {
     setIsSubmitting(false);
   }

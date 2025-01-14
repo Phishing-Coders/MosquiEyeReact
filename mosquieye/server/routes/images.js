@@ -109,45 +109,50 @@ router.get('/stats/aggregate', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { imageData, analysisData } = req.body;
-    const parsedAnalysis = JSON.parse(analysisData);
     
-    // Verify ovitrap exists
-    if (parsedAnalysis.ovitrap) {
-      const ovitrap = await Ovitrap.findOne({ ovitrapId: parsedAnalysis.ovitrap });
-      if (!ovitrap) {
-        return res.status(404).json({ 
-          message: 'Ovitrap not found' 
-        });
-      }
+    if (!imageData) {
+      return res.status(400).json({ message: 'Image data is required' });
     }
-    
-    // Remove the data:image/jpeg;base64 prefix
+
+    let parsedAnalysis;
+    try {
+      parsedAnalysis = JSON.parse(analysisData);
+    } catch (error) {
+      return res.status(400).json({ message: 'Invalid analysis data format' });
+    }
+
+    // Remove the data:image/jpeg;base64 prefix and create buffer
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
-    
-    // Create buffer from base64
     const buffer = Buffer.from(base64Data, 'base64');
     
     const imageId = uuidv4();
     
     const newImage = new Image({
       imageId,
-      ovitrapId: parsedAnalysis.ovitrap, // Add ovitrap ID
+      ovitrapId: parsedAnalysis.ovitrap,
       image: {
         data: buffer,
         contentType: 'image/jpeg'
       },
-      analysisData: parsedAnalysis
+      analysisData: {
+        ...parsedAnalysis,
+        scan_by: parsedAnalysis.scan_by // Store Clerk user ID as string
+      }
     });
 
     await newImage.save();
-    console.log('Saved image to MongoDB:', imageId);
-
-    // Update ovitrap with new image reference
+    
+    // Update ovitrap if ID exists
     if (parsedAnalysis.ovitrap) {
-      await Ovitrap.findOneAndUpdate(
-        { ovitrapId: parsedAnalysis.ovitrap },
-        { $push: { images: newImage._id } }
-      );
+      try {
+        await Ovitrap.findOneAndUpdate(
+          { ovitrapId: parsedAnalysis.ovitrap },
+          { $push: { images: newImage._id } }
+        );
+      } catch (error) {
+        console.warn('Error updating ovitrap:', error);
+        // Continue even if ovitrap update fails
+      }
     }
 
     res.status(201).json({
@@ -156,10 +161,11 @@ router.post('/', async (req, res) => {
       ovitrapId: parsedAnalysis.ovitrap
     });
   } catch (error) {
-    console.error('Error saving image:', error);
+    console.error('Server error saving image:', error);
     res.status(500).json({ 
       message: 'Error saving image and analysis', 
-      error: error.message 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

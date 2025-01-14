@@ -301,6 +301,12 @@ const AnalysisHistoryTable = ({
       ),
     },
     {
+      field: 'ovitrapId', // Add new column for Ovitrap ID
+      headerName: 'Ovitrap ID',
+      flex: 1,
+      editable: false,
+    },
+    {
       field: 'imageType',
       headerName: 'Image Type',
       flex: 1,
