@@ -168,6 +168,9 @@ const handleReposition = () => {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ 
+              borderRadius: "4px"
+            }}
           >
             <StatBox
               title={dashboardData.activeOvitraps.toString()}
@@ -183,6 +186,9 @@ const handleReposition = () => {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ 
+              borderRadius: "4px"
+            }}
           >
             <StatBox
               title={dashboardData.totalEggs.toString()}
@@ -198,6 +204,9 @@ const handleReposition = () => {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ 
+              borderRadius: "4px"
+            }}
           >
             <StatBox
               title={dashboardData.riskAreas.toString()}
@@ -213,6 +222,9 @@ const handleReposition = () => {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ 
+              borderRadius: "4px"
+            }}
           >
             <StatBox
               title={dashboardData.avgEggsPerTrap.toString()}
@@ -229,6 +241,9 @@ const handleReposition = () => {
             gridRow="span 2"
             backgroundColor={colors.primary[400]}
             p="30px"
+            sx={{ 
+              borderRadius: "4px"
+            }}
           >
             <Typography variant="h5" fontWeight="600">
               Egg Count Analytics
@@ -283,12 +298,13 @@ const handleReposition = () => {
           {/* ROW 3 - Map */}
           <Box
             gridColumn="span 12"
-            gridRow="span 3"  // Increased from span 2 to span 3
+            gridRow="span 2"  // Increased from span 2 to span 3
             backgroundColor={colors.primary[400]}
             sx={{ 
               p: "20px",
-              height: "430px",
-              overflow: "relative"
+              height: "315px",
+              overflow: "relative",
+              borderRadius: "4px"
             }}
           >
             <Typography variant="h5" fontWeight="600" mb={2}>
@@ -297,7 +313,7 @@ const handleReposition = () => {
             <Box
               id="dashboard-map"
               sx={{
-                height: "calc(100% - 60px)", // Subtract padding and header height
+                height: "calc(100% - 35px)", // Subtract padding and header height
                 width: "100%",
                 borderRadius: "4px",
                 position: "relative" // Ensure proper stacking

@@ -234,7 +234,7 @@ const Ovitrap = () => {
       flex: 1,
       renderCell: (params) => (
         <Box
-          width="70px"
+          width="90px"
           height="35px"
           p="0px"
           display="flex"
