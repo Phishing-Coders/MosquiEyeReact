@@ -286,8 +286,8 @@ const handleReposition = () => {
             gridRow="span 3"  // Increased from span 2 to span 3
             backgroundColor={colors.primary[400]}
             sx={{ 
-              p: "30px",
-              height: "500px",
+              p: "20px",
+              height: "430px",
               overflow: "relative"
             }}
           >
