@@ -12,22 +12,22 @@ const DetailedAnalysisReport = ({ openRowId, analyses, userMap, computeRiskLevel
 
   const detailsToShow = [
     { label: 'Date', value: new Date(analysis?.createdAt).toLocaleDateString() },
+    { label: 'Ovitrap ID', value: analysis?.ovitrapId || 'N/A' }, // Add Ovitrap ID here
     { label: 'Image Type', value: data.ovitrap_type || 'Unknown' },
     { label: 'Scan By', value: userMap[data.scan_by] || 'Unknown' },
     { label: 'Single Eggs', value: data.singleEggs },
     { label: 'Cluster Eggs', value: data.clustersCount },
     { label: 'Total Eggs', value: data.totalEggs },
-    { label: 'Singles Total Area', value: `${data.singlesTotalArea?.toFixed(2) || 0} px²` },
-    { label: 'Singles Average Size', value: `${data.singlesAvg?.toFixed(2) || 0} px²` },
-    { label: 'Clusters Count', value: data.clustersCount },
-    { label: 'Clusters Total Area', value: `${data.clustersTotalArea?.toFixed(2) || 0} px²` },
-    { label: 'Average Cluster Area', value: `${data.avgClusterArea?.toFixed(2) || 0} px²` },
+    { label: 'Singles Total Area', value: `${data.singlesTotalArea?.toFixed(2) || 0}` },
+    { label: 'Singles Average Size', value: `${data.singlesAvg?.toFixed(2) || 0} ` },
+    { label: 'Clusters Total Area', value: `${data.clustersTotalArea?.toFixed(2) || 0} ` },
+    { label: 'Average Cluster Area', value: `${data.avgClusterArea?.toFixed(2) || 0} ` },
     { label: 'Average Eggs Per Cluster', value: data.avgEggsPerCluster?.toFixed(2) || 0 },
     { label: 'Breteau Index (BI)', value: breteauIndex },
     { label: 'Mosquito Ovitrap Index (MOI)', value: `${moi}%` },
     { label: 'Risk Level', value: riskLevel },
     { label: 'Affected Area (Singles)', value: `${(data.singlesTotalArea / (data.singleEggs || 1)).toFixed(2)} px²` },
-    { label: 'Affected Area (Clusters)', value: `${(data.clustersTotalArea / (data.clustersCount || 1)).toFixed(2)} px²` },
+    { label: 'Affected Area (Clusters)', value: `${(data.clustersTotalArea / (data.clustersCount || 1)).toFixed(2)} px²` }
   ];
 
   return (

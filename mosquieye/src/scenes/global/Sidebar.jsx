@@ -27,13 +27,21 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
     <MenuItem
       active={selected === title}
       style={{
-        color: colors.grey[100],
+        color: colors.primary[100],
       }}
       onClick={() => setSelected(title)}
       icon={icon}
     >
       <Link to={to}>
-        <Typography>{title}</Typography>
+        <Typography 
+          sx={{ 
+            color: theme.palette.mode === 'dark' 
+              ? colors.grey[100] 
+              : colors.primary[100] // Change to black in light mode
+          }}
+        >
+          {title}
+        </Typography>
       </Link>
     </MenuItem>
   );
@@ -110,35 +118,35 @@ const menuConfig = [
       }
     ]
   },
-  {
-    category: 'Charts',
-    items: [
-      {
-        title: "Bar Chart",
-        to: "/bar",
-        icon: <BarChartOutlinedIcon />,
-        permissions: ["org:health_office"]
-      },
-      {
-        title: "Pie Chart",
-        to: "/pie",
-        icon: <PieChartOutlineOutlinedIcon />,
-        permissions: ["org:health_office"]
-      },
-      {
-        title: "Line Chart",
-        to: "/line",
-        icon: <TimelineOutlinedIcon />,
-        permissions: ["org:health_office"]
-      },
-      {
-        title: "Geography Chart",
-        to: "/geography",
-        icon: <MapOutlinedIcon />,
-        permissions: ["org:health_office"]
-      }
-    ]
-  }
+  // {
+  //   category: 'Charts',
+  //   items: [
+  //     {
+  //       title: "Bar Chart",
+  //       to: "/bar",
+  //       icon: <BarChartOutlinedIcon />,
+  //       permissions: ["org:health_office"]
+  //     },
+  //     {
+  //       title: "Pie Chart",
+  //       to: "/pie",
+  //       icon: <PieChartOutlineOutlinedIcon />,
+  //       permissions: ["org:health_office"]
+  //     },
+  //     {
+  //       title: "Line Chart",
+  //       to: "/line",
+  //       icon: <TimelineOutlinedIcon />,
+  //       permissions: ["org:health_office"]
+  //     },
+  //     {
+  //       title: "Geography Chart",
+  //       to: "/geography",
+  //       icon: <MapOutlinedIcon />,
+  //       permissions: ["org:health_office"]
+  //     }
+  // ]
+  // }
 ];
 const Sidebar = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -195,10 +203,6 @@ const Sidebar = () => {
   if (location.pathname === "/") {
     return null; // Don't render the sidebar if on the login page
   }
-
-  // console.log("Current user role:", userRole);
-  // console.log("User object:", user);
-  // console.log("Organization memberships:", user?.organizationMemberships);
 
   const hasPermission = (permissions) => {
     if (userRole === "org:admin") {
@@ -320,7 +324,7 @@ const Sidebar = () => {
                   <React.Fragment key={category}>
                     <Typography
                       variant="h6"
-                      color={colors.grey[300]}
+                      color={colors.primary[100]}
                       sx={{ m: "15px 0 5px 20px" }}
                     >
                       {category}
@@ -330,116 +334,9 @@ const Sidebar = () => {
                 );
               })}
           </Box>
-          {/* <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
-              title="Dashboard"
-              to="/dashboard"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+          {
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
-            <Item
-              title="Manage Team"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Contacts Information"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Recent Total Eggs"
-              to="/invoices"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
-            <Item
-              title="Scan"
-              to="/scan"
-              icon={<CompareIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-             <Item
-              title="QR Scan" // Add the QR Scan item here
-              to="/qrscan" // Ensure this matches your routing
-              icon={<QrCodeIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Calendar"
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Map"
-              to="/maps"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-          </Box> */}
+          }
         </Menu>
       </ProSidebar>
     </Box>

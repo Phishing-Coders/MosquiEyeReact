@@ -40,6 +40,9 @@ const AnalysisHistory = () => {
     avgEggsPerCluster: false,
     affectedAreaSingles: false,
     affectedAreaClusters: false,
+    breteauIndex: false,  // Hide BI by default
+    moi: false,           // Hide MOI by default
+    riskLevel: false      // Hide risk level by default
   });
 
   useEffect(() => {
@@ -183,6 +186,7 @@ const AnalysisHistory = () => {
     const rowData = {
       id: uniqueId, // Ensure id is a unique string
       imageUrl: `${window.location.origin}/api/images/${uniqueId}`, // Ensure imageUrl is absolute
+      ovitrapId: analysis.ovitrapId || 'N/A', // Add ovitrapId to row data
       imageType,
       totalEggs,
       singleEggs,
@@ -225,7 +229,7 @@ const AnalysisHistory = () => {
           variant="contained"
           onClick={generateReport}
           disabled={isGeneratingReport}
-          sx={{ backgroundColor: colors.blueAccent[700], '&:hover': { backgroundColor: colors.blueAccent[600] }, minWidth: '150px' }}
+          sx={{ backgroundColor: colors.blueAccent[600],'&:hover': { backgroundColor: colors.blueAccent[600] },minWidth: '140px',fontWeight: 'bold', color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'black',}}
         >
           {isGeneratingReport ? <CircularProgress size={24} color="inherit" /> : 'Generate Report'}
         </Button>

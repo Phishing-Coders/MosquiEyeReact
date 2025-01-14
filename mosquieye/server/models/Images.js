@@ -22,7 +22,7 @@ const imageSchema = new mongoose.Schema({
     avgClusterArea: Number,
     avgEggsPerCluster: Number,
     imageSize: String,
-    scan_by: String,
+    scan_by: String, // Change to String to store Clerk user ID directly
     ovitrap_type: String,
     breteauIndex: Number,
     ovitrapIndex: Number,

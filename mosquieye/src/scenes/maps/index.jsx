@@ -33,8 +33,8 @@ const MapPage = () => {
     ovitraps.map(ovitrap => ({
       lat: ovitrap.location.coordinates[1],
       lng: ovitrap.location.coordinates[0],
-      weight: ovitrap.status === 'active' ? 8 : 
-              ovitrap.status === 'maintenance' ? 5 : 1
+      weight: ovitrap.status === 'Active' ? 10 : 
+              ovitrap.status === 'Maintenance' ? 5 : 1
     })), [ovitraps]);
 
   const markerData = useMemo(() => 

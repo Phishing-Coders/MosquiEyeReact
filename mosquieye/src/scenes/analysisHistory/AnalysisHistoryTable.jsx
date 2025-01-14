@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Add useEffect
 import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Button, Box, Typography, IconButton, CircularProgress, Snackbar, Alert, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'; // Add Dialog imports
 import { Delete as DeleteIcon, Edit as EditIcon, Save, Cancel as CancelIcon } from '@mui/icons-material'; // Update imports
@@ -8,6 +8,8 @@ import { Buffer } from 'buffer';
 import { saveAs } from 'file-saver';
 import { gridFilteredSortedRowIdsSelector, useGridSelector, useGridApiContext, GridRowModes, GridActionsCellItem } from '@mui/x-data-grid'; // Add GridRowModes and GridActionsCellItem imports
 import CustomLoadingOverlay from './CustomLoadingOverlay'; // Import the custom loading overlay
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 const CustomToolbar = ({ onExport, isExportingXLSX }) => {
   const apiRef = useGridApiContext(); // Use the grid's API context
@@ -77,6 +79,31 @@ const AnalysisHistoryTable = ({
   const [rowModesModel, setRowModesModel] = useState({}); // Add rowModesModel state
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [pendingSaveId, setPendingSaveId] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [tableSize, setTableSize] = useState({
+    width: '100%',
+    height: window.innerHeight - 200 // Initial height (viewport height minus margins/padding)
+  });
+
+  // Add window resize handler
+  useEffect(() => {
+    const handleResize = () => {
+      setTableSize({
+        width: '100%',
+        height: window.innerHeight - 200 // Adjust this value based on your needs
+      });
+    };
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Call once to set initial size
+    handleResize();
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Add handleCloseNotification function
   const handleCloseNotification = () => {
@@ -218,6 +245,24 @@ const AnalysisHistoryTable = ({
 
   const userOptions = users ? users.map((u) => `${u.firstName} ${u.lastName}`) : [];
 
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setZoomLevel(1); // Reset zoom level when opening new image
+  };
+
+  const handleCloseImage = () => {
+    setSelectedImage(null);
+    setZoomLevel(1);
+  };
+
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.2, 3)); // Max zoom 3x
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.2, 0.5)); // Min zoom 0.5x
+  };
+
   // Define columns inside the component
   const columns = [
     {
@@ -249,13 +294,25 @@ const AnalysisHistoryTable = ({
         <img
           src={params.value || 'https://via.placeholder.com/80?text=No+Image'}
           alt="Analysis result"
-          style={{ width: '80px', cursor: 'pointer' }}
-          onClick={() => {
-            // Implement image selection if needed
+          style={{ 
+            width: '50px', 
+            height: '50px', 
+            objectFit: 'cover',
+            cursor: 'pointer',
+            display: 'block',
+            margin: 'auto',
+            marginTop: '5px'
           }}
+          onClick={() => handleImageClick(params.value)}
           onError={(e) => { e.target.src = 'https://via.placeholder.com/80?text=No+Image'; }}
         />
       ),
+    },
+    {
+      field: 'ovitrapId', // Add new column for Ovitrap ID
+      headerName: 'Ovitrap ID',
+      flex: 1,
+      editable: false,
     },
     {
       field: 'imageType',
@@ -482,7 +539,12 @@ const AnalysisHistoryTable = ({
 
   return (
     <>
-      <Box style={{ height: 600, width: '100%', marginBottom: '6rem' }}>  {/* Add marginBottom here */}
+      <Box style={{ 
+        height: tableSize.height, 
+        width: tableSize.width, 
+        transition: 'height 0.3s ease', // Smooth transition for height changes
+        marginBottom: '6rem',
+      }}>
         <DataGrid
           apiRef={apiRef} // Pass apiRef to the DataGrid
           rows={rows}
@@ -521,6 +583,20 @@ const AnalysisHistoryTable = ({
           editMode="row"
           onRowEditStop={handleRowEditStop}
           onProcessRowUpdateError={handleProcessRowUpdateError} // Add this line
+          sx={{
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#333', // Adjust header background color if needed
+              color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'black',
+              fontWeight: 'bold', // Make header text bold
+              fontSize: '1rem', // Adjust header text size if needed
+            },
+            '& .MuiDataGrid-cell': {
+              color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'black',
+              //fontWeight: 'bold', // Make header text bold
+              fontSize: '14px', // Adjust header text size if needed
+            }
+          }}
+          
         />
         <Snackbar
           open={notification.open}
@@ -573,6 +649,73 @@ const AnalysisHistoryTable = ({
             Save
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Add Image Dialog */}
+      <Dialog
+        open={!!selectedImage}
+        onClose={handleCloseImage}
+        maxWidth={false}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#1F2A40',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            width: 'auto',
+            height: 'auto'
+          }
+        }}
+      >
+        <DialogContent sx={{ p: 0, position: 'relative' }}>
+          {/* Zoom controls */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              zIndex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              borderRadius: '8px',
+              padding: '4px'
+            }}
+          >
+            <IconButton onClick={handleZoomIn} sx={{ color: 'white' }}>
+              <AddIcon />
+            </IconButton>
+            <Typography sx={{ display: 'inline', mx: 1, color: 'white' }}>
+              {Math.round(zoomLevel * 100)}%
+            </Typography>
+            <IconButton onClick={handleZoomOut} sx={{ color: 'white' }}>
+              <RemoveIcon />
+            </IconButton>
+          </Box>
+
+          {/* Image container with scroll */}
+          <Box
+            sx={{
+              overflow: 'auto',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Analysis result enlarged"
+                style={{
+                  transform: `scale(${zoomLevel})`,
+                  transformOrigin: 'center center',
+                  transition: 'transform 0.2s ease-in-out',
+                  maxWidth: '100%',
+                  maxHeight: '100%'
+                }}
+              />
+            )}
+          </Box>
+        </DialogContent>
       </Dialog>
     </>
   );
