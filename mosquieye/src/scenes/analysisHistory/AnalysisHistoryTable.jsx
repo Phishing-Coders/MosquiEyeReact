@@ -532,12 +532,12 @@ const AnalysisHistoryTable = ({
           sx={{
             '& .MuiDataGrid-columnHeaders': {
               backgroundColor: '#333', // Adjust header background color if needed
-              color: 'white', // Header text color
+              color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'black',
               fontWeight: 'bold', // Make header text bold
               fontSize: '1rem', // Adjust header text size if needed
             },
             '& .MuiDataGrid-cell': {
-              color: 'white', // Header text color
+              color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'black',
               //fontWeight: 'bold', // Make header text bold
               fontSize: '14px', // Adjust header text size if needed
             }

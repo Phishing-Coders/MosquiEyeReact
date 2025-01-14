@@ -225,7 +225,7 @@ const AnalysisHistory = () => {
           variant="contained"
           onClick={generateReport}
           disabled={isGeneratingReport}
-          sx={{ backgroundColor: colors.blueAccent[700], '&:hover': { backgroundColor: colors.blueAccent[600] }, minWidth: '150px' }}
+          sx={{ backgroundColor: colors.blueAccent[600],'&:hover': { backgroundColor: colors.blueAccent[600] },minWidth: '140px',fontWeight: 'bold', color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'black',}}
         >
           {isGeneratingReport ? <CircularProgress size={24} color="inherit" /> : 'Generate Report'}
         </Button>
