@@ -23,4 +23,7 @@ export default defineConfig({
       allow: ['.'], // Ensure Vite can access files properly
     }
   },
+  define: {
+    'process.env.VITE_APP_GOOGLE_MAP_API': JSON.stringify(process.env.VITE_APP_GOOGLE_MAP_API)
+  }
 });

@@ -10,6 +10,10 @@ router.post('/', async (req, res) => {
   try {
     const { imageData, analysisData } = req.body;
     const parsedAnalysis = JSON.parse(analysisData);
+
+    const now = new Date();
+    const malaysiaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+    const isoDate = malaysiaTime.toISOString();
     
     // Verify ovitrap exists
     if (parsedAnalysis.ovitrap) {
@@ -36,7 +40,8 @@ router.post('/', async (req, res) => {
         data: buffer,
         contentType: 'image/jpeg'
       },
-      analysisData: parsedAnalysis
+      analysisData: parsedAnalysis,
+      createdAt: isoDate
     });
 
     await newImage.save();

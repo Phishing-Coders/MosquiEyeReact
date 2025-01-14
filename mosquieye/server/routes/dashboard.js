@@ -6,22 +6,67 @@ const router = express.Router();
 
 router.get('/statistics', async (req, res) => {
   try {
-    const [ovitraps, images] = await Promise.all([
+    // Get current date range for this week
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Start from Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const [ovitraps, images, weeklyStats] = await Promise.all([
       Ovitrap.find(),
-      Image.find().sort({ createdAt: -1 }).limit(10)
+      Image.find().sort({ createdAt: -1 }).limit(10),
+      Image.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startOfWeek }
+          }
+        },
+        {
+          $group: {
+            _id: { $dayOfWeek: '$createdAt' },
+            totalEggs: { $sum: '$analysisData.totalEggs' }
+          }
+        },
+        {
+          $sort: { _id: 1 }
+        }
+      ])
     ]);
+
+    const ovitrapData = ovitraps.map(ovitrap => ({
+      id: ovitrap.ovitrapId,
+      location: ovitrap.location,
+      status: ovitrap.status,
+      metadata: ovitrap.metadata,
+      totalEggs: ovitrap.statistics?.totalEggs || 0
+    }));
+
+    // Convert weeklyStats to the format expected by LineChart
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const formattedWeeklyStats = daysOfWeek.map((day, index) => {
+      const stat = weeklyStats.find(s => s._id === index + 1);
+      return {
+        x: day,
+        y: stat ? stat.totalEggs : 0
+      }
+    });
 
     const stats = {
       activeOvitraps: ovitraps.filter(o => o.status === 'Active').length,
       totalEggs: images.reduce((sum, img) => sum + (img.analysisData?.totalEggs || 0), 0),
-      riskAreas: ovitraps.filter(o => o.status === 'maintenance').length,
+      riskAreas: ovitraps.filter(o => o.status === 'Maintenance').length,
       avgEggsPerTrap: images.length ? Math.round(images.reduce((sum, img) => sum + (img.analysisData?.totalEggs || 0), 0) / ovitraps.length) : 0,
       recentUploads: images.map(img => ({
         id: img._id,
         ovitrapId: img.ovitrapId,
         totalEggs: img.analysisData?.totalEggs || 0,
-        date: img.createdAt
-      }))
+        date: img.createdAt,
+        location: {
+          coordinates: img?.location?.coordinates || [103.63767742492678, 1.5587898459904728]
+        }
+      })),
+      monthlyStats: formattedWeeklyStats, // This will now show accurate daily counts
+      ovitraps: ovitrapData
     };
 
     res.json(stats);
