@@ -86,7 +86,8 @@ const Team = () => {
   return (
     <Box m="20px">
       <Header title="TEAM" subtitle="Managing the Team Members" />
-      <OrganizationSwitcher />
+      <OrganizationSwitcher
+        hidePersonal={true} />
       <Box
         m="20px 0 0 0"
         height="75vh"
