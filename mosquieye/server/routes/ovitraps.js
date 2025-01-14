@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
       ovitraps,
       currentPage: page,
       totalPages: Math.ceil(total / limit),
-      totalOvitraps: total
+      totalOvitraps: ovitraps.length
     });
   } catch (error) {
     console.error('Error fetching ovitraps:', error);

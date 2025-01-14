@@ -22,5 +22,5 @@ export default defineConfig({
     fs: {
       allow: ['.'], // Ensure Vite can access files properly
     }
-  },
+  }
 });

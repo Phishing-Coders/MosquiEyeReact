@@ -1,27 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress, Typography, useTheme, IconButton } from "@mui/material";
+import { Box, CircularProgress, Grid, Typography, useTheme, IconButton } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import StatBox from "../../components/StatBox";
 import PestControlOutlinedIcon from '@mui/icons-material/PestControlOutlined';
 import FmdBadOutlinedIcon from '@mui/icons-material/FmdBadOutlined';
 import EmergencyOutlinedIcon from '@mui/icons-material/EmergencyOutlined';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
 import LineChart from "../../components/LineChart";
-import { loadGoogleMapsAPI } from '../utils/googleMapsLoader';
 import axios from "axios";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [googleMaps, setGoogleMaps] = useState(null);
-  const [map, setMap] = useState(null);
-  const [heatmap, setHeatmap] = useState(null);
-  const [ovitraps, setOvitraps] = useState([]);
-  const apiKey = import.meta.env.VITE_APP_GOOGLE_MAP_API;
-
-  // Add default center coordinates
-  const DEFAULT_CENTER = { lat: 1.5587898459904728, lng: 103.63767742492678 };
+  const [stats, setStats] = useState({
+    activeOvitraps: 0,
+    totalEggs: 0,
+    riskAreas: 0,
+    avgEggsPerTrap: 0
+  });
 
   const [dashboardData, setDashboardData] = useState({
     activeOvitraps: 0,
@@ -32,117 +28,24 @@ const Dashboard = () => {
     weeklyStats: [],
     monthlyStats: []
   });
-  const [loading, setLoading] = useState(true);
 
-  // Fetch both dashboard and ovitrap data
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const [dashboardResponse, ovitrapsResponse] = await Promise.all([
-          axios.get('/api/dashboard/statistics'),
-          axios.get('/api/ovitraps')
-        ]);
-        
-        setDashboardData(dashboardResponse.data);
-        setOvitraps(ovitrapsResponse.data.ovitraps);
+        const response = await axios.get('/api/dashboard/statistics');
+        console.log('Dashboard data:', response.data);
+        setDashboardData(response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching dashboard data:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+  
+    fetchDashboardData();
   }, []);
-
- // Initialize map with markers and heatmap
- useEffect(() => {
-  if (!apiKey || !ovitraps.length) return;
-
-  loadGoogleMapsAPI(apiKey)
-    .then((googleMaps) => {
-      setGoogleMaps(googleMaps);
-      
-      const mapInstance = new googleMaps.Map(document.getElementById('dashboard-map'), {
-        center: { lat: 1.5587898459904728, lng: 103.63767742492678 },
-        zoom: 15,
-        mapTypeControl: false,
-        streetViewControl: false,
-      });
-      setMap(mapInstance);
-
-      // Add markers for each ovitrap
-      ovitraps.forEach((ovitrap) => {
-        const marker = new googleMaps.Marker({
-          position: { 
-            lat: ovitrap.location.coordinates[1],
-            lng: ovitrap.location.coordinates[0]
-          },
-          map: mapInstance,
-          title: `Ovitrap ${ovitrap.ovitrapId} (${ovitrap.metadata.area || 'No area'})`
-        });
-
-        // Add info window
-        const infoWindow = new googleMaps.InfoWindow({
-          content: `
-            <div style="color: black; padding: 5px;">
-              <h3>Ovitrap ${ovitrap.ovitrapId}</h3>
-              <p>Area: ${ovitrap.metadata.area || 'No area'}</p>
-              <p>Status: ${ovitrap.status}</p>
-            </div>
-          `
-        });
-
-        marker.addListener('click', () => {
-          infoWindow.open(mapInstance, marker);
-        });
-      });
-
-      // Create heatmap layer
-      const heatmapData = ovitraps
-        .filter(ovitrap => ovitrap.location?.coordinates?.length === 2)
-        .map(ovitrap => ({
-          location: new googleMaps.LatLng(
-            ovitrap.location.coordinates[1],
-            ovitrap.location.coordinates[0]
-          ),
-          weight: ovitrap.status === 'Active' ? 10 : 
-                  ovitrap.status === 'Maintenance' ? 5 : 1
-        }));
-
-      const heatmapLayer = new googleMaps.visualization.HeatmapLayer({
-        data: heatmapData,
-        map: mapInstance,
-        radius: 100,
-        opacity: 0.7,
-        gradient: [
-          'rgba(0, 255, 255, 0)',
-          'rgba(0, 255, 255, 1)',
-          'rgba(0, 191, 255, 1)',
-          'rgba(0, 127, 255, 1)',
-          'rgba(0, 63, 255, 1)',
-          'rgba(0, 0, 255, 1)',
-          'rgba(0, 0, 223, 1)',
-          'rgba(0, 0, 191, 1)',
-          'rgba(0, 0, 159, 1)',
-          'rgba(0, 0, 127, 1)',
-          'rgba(63, 0, 91, 1)',
-          'rgba(127, 0, 63, 1)',
-          'rgba(191, 0, 31, 1)',
-          'rgba(255, 0, 0, 1)'
-        ]
-      });
-
-      setHeatmap(heatmapLayer);
-    })
-    .catch(error => console.error('Google Maps API failed to load', error));
-}, [apiKey, ovitraps]);
-
-const handleReposition = () => {
-  if (map) {
-    map.panTo(DEFAULT_CENTER);
-    map.setZoom(15);
-  }
-};
 
   return (
     <Box m="20px">
@@ -223,7 +126,7 @@ const handleReposition = () => {
             />
           </Box>
   
-          {/* ROW 2 - Charts & Activity */}
+          {/* ROW 2 - Charts */}
           <Box
             gridColumn="span 8"
             gridRow="span 2"
@@ -238,6 +141,7 @@ const handleReposition = () => {
             </Box>
           </Box>
           
+          {/* Recent Activity */}
           <Box
             gridColumn="span 4"
             gridRow="span 2"
@@ -278,45 +182,6 @@ const handleReposition = () => {
                 </Box>
               </Box>
             ))}
-          </Box>
-  
-          {/* ROW 3 - Map */}
-          <Box
-            gridColumn="span 12"
-            gridRow="span 3"  // Increased from span 2 to span 3
-            backgroundColor={colors.primary[400]}
-            sx={{ 
-              p: "30px",
-              height: "500px",
-              overflow: "relative"
-            }}
-          >
-            <Typography variant="h5" fontWeight="600" mb={2}>
-              Ovitrap Heatmap Overview
-            </Typography>
-            <Box
-              id="dashboard-map"
-              sx={{
-                height: "calc(100% - 60px)", // Subtract padding and header height
-                width: "100%",
-                borderRadius: "4px",
-                position: "relative" // Ensure proper stacking
-              }}
-            />
-            <IconButton
-              onClick={handleReposition}
-              sx={{
-                position: "absolute",
-                bottom: "50px",
-                right: "50px",
-                backgroundColor: colors.primary[400],
-                '&:hover': {
-                  backgroundColor: colors.primary[300],
-                }
-              }}
-            >
-              <MyLocationIcon />
-            </IconButton>
           </Box>
         </Box>
       )}
