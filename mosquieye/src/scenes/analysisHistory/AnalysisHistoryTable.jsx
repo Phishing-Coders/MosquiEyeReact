@@ -294,7 +294,15 @@ const AnalysisHistoryTable = ({
         <img
           src={params.value || 'https://via.placeholder.com/80?text=No+Image'}
           alt="Analysis result"
-          style={{ width: '80px', height: '80px', objectFit: 'cover', cursor: 'pointer' }}
+          style={{ 
+            height: '50px',
+            width: '50px', height: '80px', objectFit: 'cover',
+            objectFit: 'contain',
+            cursor: 'pointer',
+            display: 'block',
+            margin: 'auto',
+            marginTop: '5px'
+          }}
           onClick={() => handleImageClick(params.value)}
           onError={(e) => { e.target.src = 'https://via.placeholder.com/80?text=No+Image'; }}
         />
@@ -576,11 +584,19 @@ const AnalysisHistoryTable = ({
           onRowEditStop={handleRowEditStop}
           onProcessRowUpdateError={handleProcessRowUpdateError} // Add this line
           sx={{
-            '& .MuiDataGrid-root': {
-              height: '100%',
-              width: '100%'
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#333', // Adjust header background color if needed
+              color: 'white', // Header text color
+              fontWeight: 'bold', // Make header text bold
+              fontSize: '1rem', // Adjust header text size if needed
+            },
+            '& .MuiDataGrid-cell': {
+              color: 'white', // Header text color
+              //fontWeight: 'bold', // Make header text bold
+              fontSize: '14px', // Adjust header text size if needed
             }
           }}
+          
         />
         <Snackbar
           open={notification.open}
