@@ -174,7 +174,7 @@ const handleReposition = () => {
               subtitle="Active Ovitraps"
               progress="0.75"
               increase="+14%"
-              icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
             />
           </Box>
           <Box
@@ -189,7 +189,7 @@ const handleReposition = () => {
               subtitle="Total Eggs"
               progress="0.50"
               increase="+21%"
-              icon={<FmdBadOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              icon={<FmdBadOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
             />
           </Box>
           <Box
@@ -204,7 +204,7 @@ const handleReposition = () => {
               subtitle="Risk Areas"
               progress="0.30"
               increase="+5%"
-              icon={<EmergencyOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              icon={<EmergencyOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
             />
           </Box>
           <Box
@@ -219,7 +219,7 @@ const handleReposition = () => {
               subtitle="Avg Eggs per Trap"
               progress="0.80"
               increase="+43%"
-              icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
             />
           </Box>
   
