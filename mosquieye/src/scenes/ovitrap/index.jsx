@@ -354,6 +354,7 @@ const Ovitrap = () => {
           rows={ovitraps}
           columns={columns}
           getRowId={(row) => row.ovitrapId}
+          rowsPerPageOptions={[10, 25, 50, 100]}
         />
       </Box>
     )}
