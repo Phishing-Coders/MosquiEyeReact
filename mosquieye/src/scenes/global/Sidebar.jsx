@@ -69,12 +69,12 @@ const menuConfig = [
         icon: <PeopleOutlinedIcon />,
         permissions: ["org:health_office"]
       },
-      {
-        title: "Contacts Information",
-        to: "/contacts",
-        icon: <ContactsOutlinedIcon />,
-        permissions: ["org:health_office", "org:operations_team"]
-      },
+      // {
+      //   title: "Contacts Information",
+      //   to: "/contacts",
+      //   icon: <ContactsOutlinedIcon />,
+      //   permissions: ["org:health_office", "org:operations_team"]
+      // },
       {
         title: "Ovitrap Management",
         to: "/ovitrap",
