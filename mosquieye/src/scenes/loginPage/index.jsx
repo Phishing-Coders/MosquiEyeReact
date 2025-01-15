@@ -2,7 +2,7 @@ import { Box, Button, Grid, Snackbar, Alert, Typography, TextField } from "@mui/
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import background from "../../assets/medicalbackground1.png";
+import background from "../../assets/login-background.webp";
 import logo from "../../assets/favicon.ico";
 import { SignIn } from "@clerk/clerk-react";
 
