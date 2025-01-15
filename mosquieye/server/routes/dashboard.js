@@ -1,6 +1,7 @@
 import express from 'express';
 import Ovitrap from '../models/Ovitrap.js';
 import Image from '../models/Images.js';
+import User from '../models/Users.js';
 
 const router = express.Router();
 
@@ -30,7 +31,8 @@ router.get('/statistics', async (req, res) => {
         {
           $sort: { _id: 1 }
         }
-      ])
+      ]),
+      User.find({}, 'clerkUserId firstName lastName')
     ]);
 
     const ovitrapData = ovitraps.map(ovitrap => ({
@@ -51,6 +53,14 @@ router.get('/statistics', async (req, res) => {
       }
     });
 
+    const scan_by_ids = images.map(img => img.analysisData?.scan_by).filter(id => id);
+    const users = await User.find({ clerkUserId: { $in: scan_by_ids } });
+
+    const userMap = users.reduce((acc, user) => {
+      acc[user.clerkUserId] = `${user.firstName} ${user.lastName}`;
+      return acc;
+    }, {});
+
     const stats = {
       activeOvitraps: ovitraps.filter(o => o.status === 'Active').length,
       totalEggs: images.reduce((sum, img) => sum + (img.analysisData?.totalEggs || 0), 0),
@@ -61,6 +71,8 @@ router.get('/statistics', async (req, res) => {
         ovitrapId: img.ovitrapId,
         totalEggs: img.analysisData?.totalEggs || 0,
         date: img.createdAt,
+        scan_by: img.analysisData?.scan_by || 'Unknown',
+        userName: userMap[img.analysisData?.scan_by] || 'Unknown User',
         location: {
           coordinates: img?.location?.coordinates || [103.63767742492678, 1.5587898459904728]
         }

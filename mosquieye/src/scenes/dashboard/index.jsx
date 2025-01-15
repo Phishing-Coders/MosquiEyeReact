@@ -145,198 +145,240 @@ const handleReposition = () => {
 };
 
   return (
-    <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your operations dashboard" />
-      </Box>
-  
-      {loading ? (
-        <Box display="flex" justifyContent="center" m="20px">
-          <CircularProgress />
+      <Box m={{ xs: "10px", sm: "20px" }}>
+        <Box display="flex" flexDirection="column">
+          <Header title="DASHBOARD" subtitle="Welcome to your operations dashboard" />
         </Box>
-      ) : (
-        <Box
-          display="grid"
-          gridTemplateColumns="repeat(12, 1fr)"
-          gridAutoRows="140px"
-          gap="20px"
-        >
-          {/* ROW 1 - Stats */}
-          <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            sx={{ 
-              borderRadius: "4px"
-            }}
-          >
-            <StatBox
-              title={dashboardData.activeOvitraps.toString()}
-              subtitle="Active Ovitraps"
-              progress="0.75"
-              increase="+14%"
-              icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            sx={{ 
-              borderRadius: "4px"
-            }}
-          >
-            <StatBox
-              title={dashboardData.totalEggs.toString()}
-              subtitle="Total Eggs"
-              progress="0.50"
-              increase="+21%"
-              icon={<FmdBadOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            sx={{ 
-              borderRadius: "4px"
-            }}
-          >
-            <StatBox
-              title={dashboardData.riskAreas.toString()}
-              subtitle="Risk Areas"
-              progress="0.30"
-              increase="+5%"
-              icon={<EmergencyOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            sx={{ 
-              borderRadius: "4px"
-            }}
-          >
-            <StatBox
-              title={dashboardData.avgEggsPerTrap.toString()}
-              subtitle="Avg Eggs per Trap"
-              progress="0.80"
-              increase="+43%"
-              icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "40px" }} />}
-            />
-          </Box>
   
-          {/* ROW 2 - Charts & Activity */}
+        {loading ? (
+          <Box display="flex" justifyContent="center" m="20px">
+            <CircularProgress />
+          </Box>
+        ) : (
           <Box
-            gridColumn="span 8"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-            p="30px"
-            sx={{ 
+            display="grid"
+            gridTemplateColumns={{
+              xs: "1fr",
+              sm: "repeat(12, 1fr)"
+            }}
+            gap="20px"
+          >
+            {/* ROW 1 - Stats */}
+            <Box
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 3"
+              }}
+              backgroundColor={colors.primary[400]}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              p="15px"
+              sx={{ 
               borderRadius: "4px"
             }}
           >
-            <Typography variant="h5" fontWeight="600">
-              Egg Count Analytics
-            </Typography>
-            <Box height="250px" mt="-20px">
-              <LineChart data={dashboardData.monthlyStats} />
+              <StatBox
+                title={dashboardData.activeOvitraps.toString()}
+                subtitle="Active Ovitraps"
+                progress="0.75"
+                increase="+14%"
+                icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              />
             </Box>
-          </Box>
-          
-          <Box
-            gridColumn="span 4"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-            overflow="auto"
-          >
             <Box
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 3"
+              }}
+              backgroundColor={colors.primary[400]}
               display="flex"
-              justifyContent="space-between"
               alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              colors={colors.grey[100]}
+              justifyContent="center"
               p="15px"
-            >
-              <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-                Recent Activity
-              </Typography>
+              sx={{ 
+              borderRadius: "4px"
+            }}
+          >
+              <StatBox
+                title={dashboardData.totalEggs.toString()}
+                subtitle="Total Eggs"
+                progress="0.50"
+                increase="+21%"
+                icon={<FmdBadOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              />
             </Box>
-            {dashboardData.recentUploads.map((upload, i) => (
+            <Box
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 3"
+              }}
+              backgroundColor={colors.primary[400]}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              p="15px"
+              sx={{ 
+              borderRadius: "4px"
+            }}
+          >
+              <StatBox
+                title={dashboardData.riskAreas.toString()}
+                subtitle="Risk Areas"
+                progress="0.30"
+                increase="+5%"
+                icon={<EmergencyOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              />
+            </Box>
+            <Box
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 3"
+              }}
+              backgroundColor={colors.primary[400]}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              p="15px"
+              sx={{ 
+              borderRadius: "4px"
+            }}
+          >
+              <StatBox
+                title={dashboardData.avgEggsPerTrap.toString()}
+                subtitle="Avg Eggs per Trap"
+                progress="0.80"
+                increase="+43%"
+                icon={<PestControlOutlinedIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+              />
+            </Box>
+  
+            {/* ROW 2 - Charts */}
+            <Box
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 8"
+              }}
+              gridRow={{
+                xs: "span 2",
+                sm: "span 2"
+              }}
+              backgroundColor={colors.primary[400]}
+              p="15px"
+              sx={{ 
+              borderRadius: "4px"
+            }}
+          >
+              <Typography variant="h5" fontWeight="600">
+                Egg Count Analytics
+              </Typography>
+              <Box height={{ xs: "200px", sm: "250px" }} mt="-20px">
+                <LineChart data={dashboardData.monthlyStats} />
+              </Box>
+            </Box>
+  
+            {/* Recent Activity */}
+            <Box
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 4"
+              }}
+              gridRow={{
+                xs: "span 2",
+                sm: "span 2"
+              }}
+              backgroundColor={colors.primary[400]}
+              overflow="auto"
+              sx={{
+                maxHeight: { xs: "300px", sm: "auto" }
+              }}
+            >
               <Box
-                key={`${upload.id}-${i}`}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
                 borderBottom={`4px solid ${colors.primary[500]}`}
                 p="15px"
               >
-                <Box>
-                  <Typography color={colors.greenAccent[500]} variant="h5" fontWeight="600">
-                    Ovitrap {upload.ovitrapId}
-                  </Typography>
-                  <Typography color={colors.grey[100]}>
-                    {upload.totalEggs} eggs detected
-                  </Typography>
-                </Box>
-                <Box color={colors.grey[100]}>
-                  {new Date(upload.date).toLocaleDateString()}
-                </Box>
+                <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+                  Recent Activity
+                </Typography>
               </Box>
-            ))}
-          </Box>
+              {dashboardData.recentUploads.map((upload, i) => (
+                <Box
+                  key={`${upload.id}-${i}`}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  borderBottom={`4px solid ${colors.primary[500]}`}
+                  p="15px"
+                >
+                  <Box>
+                    <Typography color={colors.greenAccent[500]} variant="h5" fontWeight="600">
+                      Ovitrap {upload.ovitrapId}
+                    </Typography>
+                    <Typography color={colors.grey[100]}>
+                      {upload.totalEggs} eggs detected
+                    </Typography>
+                    <Typography variant="body2" color={colors.grey[300]}>
+                      by {upload.userName}
+                    </Typography>
+                  </Box>
+                  <Box color={colors.grey[100]}>
+                    {new Date(upload.date).toLocaleDateString()}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
   
-          {/* ROW 3 - Map */}
-          <Box
-            gridColumn="span 12"
-            gridRow="span 2"  // Increased from span 2 to span 3
-            backgroundColor={colors.primary[400]}
-            sx={{ 
-              p: "20px",
-              height: "315px",
-              overflow: "relative",
-              borderRadius: "4px"
-            }}
-          >
-            <Typography variant="h5" fontWeight="600" mb={2}>
-              Ovitrap Heatmap Overview
-            </Typography>
+            {/* ROW 3 - Map */}
             <Box
-              id="dashboard-map"
-              sx={{
-                height: "calc(100% - 35px)", // Subtract padding and header height
-                width: "100%",
-                borderRadius: "4px",
-                position: "relative" // Ensure proper stacking
+              gridColumn={{
+                xs: "span 1",
+                sm: "span 12"
               }}
-            />
-            <IconButton
-              onClick={handleReposition}
-              sx={{
-                position: "absolute",
-                bottom: "50px",
-                right: "50px",
-                backgroundColor: colors.primary[400],
-                '&:hover': {
-                  backgroundColor: colors.primary[300],
-                }
+              gridRow={{
+                xs: "span 2",
+                sm: "span 3"
+              }}
+              backgroundColor={colors.primary[400]}
+              sx={{ 
+                p: "20px",
+                height: { xs: "400px", sm: "380px" },
+                position: "relative",
+                borderRadius: "4px"
               }}
             >
-              <MyLocationIcon />
-            </IconButton>
+              <Typography variant="h5" fontWeight="600" mb={2}>
+                Ovitrap Heatmap Overview
+              </Typography>
+              <Box
+                id="dashboard-map"
+                sx={{
+                  height: "calc(100% - 35px)",
+                  width: "100%",
+                  borderRadius: "4px",
+                  position: "relative"
+                }}
+              />
+              <IconButton
+                onClick={handleReposition}
+                sx={{
+                  position: "absolute",
+                  bottom: { xs: "30px", sm: "50px" },
+                  right: { xs: "30px", sm: "50px" },
+                  backgroundColor: colors.primary[400],
+                  '&:hover': {
+                    backgroundColor: colors.primary[300],
+                  }
+                }}
+              >
+                <MyLocationIcon />
+              </IconButton>
+            </Box>
           </Box>
-        </Box>
-      )}
-    </Box>
+        )}
+      </Box>
   );
 };
 
