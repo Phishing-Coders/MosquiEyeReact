@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Box, Typography, Alert, Snackbar, Button, Card, CardContent } from '@mui/material';
 import Header from "../../components/Header";
@@ -14,6 +13,7 @@ const QRScan = () => {
   const [scanResult, setScanResult] = useState('');
   const [error, setError] = useState('');
   const [ovitrap, setOvitrap] = useState(null);
+  const [showScanner, setShowScanner] = useState(false);
 
   const handleScan = async () => {
     try {
@@ -61,38 +61,39 @@ const QRScan = () => {
         subtitle="Scan QR code to identify ovitrap and proceed with image upload" 
       />
 
-      <Card sx={{ maxWidth: 600, mx: 'auto', mt: 3 }}>
-        <CardContent>
-          {isMobile ? (
-            <Box sx={{ textAlign: 'center' }}>
-              <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={handleScan}
-                sx={{ mb: 2 }}
-              >
-                Open Camera to Scan QR
-              </Button>
-              {scanResult && (
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                  Scanned Ovitrap ID: {scanResult}
-                </Typography>
-              )}
-            </Box>
-          ) : (
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                Please use a mobile device to scan QR codes
-              </Typography>
-              <BarcodeScannerComponent
-                width="100%"
-                height={400}
-                onUpdate={handleWebScan}
-              />
-            </Box>
+    <Card sx={{ maxWidth: 600, mx: 'auto', mt: 3 }}>
+      <CardContent>
+        <Box sx={{ textAlign: 'center' }}>
+          {isMobile && (
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                setShowScanner(true);
+                handleWebScan();
+              }}
+              sx={{ mb: 2 }}
+            >
+              Open Camera to Scan QR
+            </Button>
           )}
-        </CardContent>
-      </Card>
+
+          {(!isMobile || (isMobile && showScanner)) && (
+            <BarcodeScannerComponent
+              width="100%"
+              height={400}
+              onUpdate={handleWebScan}
+            />
+          )}
+
+          {scanResult && (
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              Scanned Ovitrap ID: {scanResult}
+            </Typography>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
 
       <Snackbar 
         open={!!error} 

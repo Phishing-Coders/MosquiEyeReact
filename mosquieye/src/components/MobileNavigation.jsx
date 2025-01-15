@@ -5,6 +5,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ScannerIcon from "@mui/icons-material/Scanner";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { useUser } from '@clerk/clerk-react';
@@ -22,31 +23,25 @@ const MobileNavigation = () => {
       label: "Home",
       icon: <HomeOutlinedIcon />,
       path: '/dashboard',
-      roles: ["org:admin", "org:health_office"]
+      roles: ["org:admin", "org:operations_team"]
     },
     {
       label: "Scan",
       icon: <ScannerIcon />,
       path: '/scan',
-      roles: ["org:admin", "org:health_office", "org:operations_team"]
+      roles: ["org:admin", "org:operations_team"]
     },
     {
       label: "QR Scan",
-      icon: <ScannerIcon />,
+      icon: <QrCodeIcon />,
       path: '/qrscan',
-      roles: ["org:admin", "org:health_office", "org:operations_team"]
+      roles: ["org:admin", "org:operations_team"]
     },
     {
       label: "Calendar",
       icon: <BarChartIcon />,
       path: '/calendar',
-      roles: ["org:admin", "org:health_office", "org:operations_team"]
-    },
-    {
-      label: "Profile",
-      icon: <PersonOutlinedIcon />,
-      path: '/profile',
-      roles: ["org:admin", "org:health_office", "org:operations_team"]
+      roles: ["org:admin", "org:operations_team"]
     }
   ];
 

@@ -241,16 +241,16 @@ const Scan = () => {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
           {ovitrapId && (
             <Typography 
-              variant="caption" 
-              color="textSecondary" 
-              sx={{ display: 'block', mt: 1 }}
+            variant="caption" 
+            color="textSecondary" 
+            sx={{ display: 'block', mt: 1 }}
             >
               Ovitrap ID locked from QR scan
             </Typography>
           )}
+          </FormControl>
         </Box>
 
         {showImageOptions && (
