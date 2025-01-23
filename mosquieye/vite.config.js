@@ -12,9 +12,9 @@ export default defineConfig({
     port: 3000, // Replace with your desired port
     proxy: {
       '/api': {
-        target:'https://mosquieye-server.vercel.app/',
+        target: 'https://mosquieye-server-bfn34.ondigitalocean.app',
         changeOrigin: true,
-        secure: false,
+        secure: true,
       }
     },
     fs: {
